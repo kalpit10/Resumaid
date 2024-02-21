@@ -1,0 +1,32 @@
+.layout{
+    height: 100vh;
+}
+
+.header{
+    height: 13%;
+    background-color: rgb(252, 251, 251);
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    box-shadow: 5px 10px 18px #dfdede;
+}
+
+.header button{
+    color: black;
+    background-color: rgb(255, 255, 255);
+}
+
+.header h1{
+    color: rgba(12, 9, 46, 0.5);
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.content{
+    height: 85%;
+    margin-top: 20px;
+    border-radius: 5px;
+    padding: 10px;
+}

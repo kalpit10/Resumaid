@@ -1,0 +1,9 @@
+.imgresult{
+    height: 400px;
+    width: 550px;
+}
+
+.backicn{
+    font-size: 60px;
+    filter: drop-shadow(3px 2px 2px rgb(0 0 0 / 0.4));
+}

@@ -1,0 +1,19 @@
+.imgupld {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .imgupld {
+    max-width: 500px;
+    height: 400px;
+  }
+}
+
+@media (max-width: 767px) {
+  .font {
+    font-size: 1.2rem; /* adjust the font size as needed */
+    padding: 0.2rem; /* adjust the padding as needed */
+    margin-bottom: 0rem;
+  }
+}
