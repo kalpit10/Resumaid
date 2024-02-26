@@ -20,7 +20,7 @@ Bootstrap 5
 # Installation
 
 1. Clone the repository
-2. git clone https://github.com/kalpit10/RESUMAID...git
+2. git clone https://github.com/kalpit10/Resumaid.git
 3. cd client
 4. npm start
 5. Start the application
