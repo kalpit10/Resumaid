@@ -44,8 +44,8 @@ function SkillsEducation() {
   };
 
   useEffect(() => {
-    // fetch("http://localhost:5000/colleges")
-    fetch("https://resumaid.herokuapp.com/colleges")
+    fetch("http://localhost:5000/colleges")
+      // fetch("https://resumaid.herokuapp.com/colleges")
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -65,7 +65,7 @@ function SkillsEducation() {
         {(fields, { add, remove }) => (
           <>
             <div className="row">
-              {fields.map(({key, name, label, ...restField }) => (
+              {fields.map(({ key, name, label, ...restField }) => (
                 <>
                   <div className="col-md-2">
                     <Form.Item
