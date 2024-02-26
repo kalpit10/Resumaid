@@ -17,7 +17,7 @@ function Landing() {
         integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
         crossOrigin="anonymous"
       />
-      
+
       <link rel={landing1} href="finaldraft.css" />
       <nav
         id="navbar-example2"
@@ -239,8 +239,8 @@ function Landing() {
             </div>
           </div>
 
-          <div class="col">
-            <p class="div4para p-3 m-3 font fw-bold">
+          <div className="col">
+            <p className="div4para p-3 m-3 font fw-bold">
               "Welcome to Resumaid, the ultimate destination for building the
               perfect resume. Our website is designed to help job seekers create
               professional and polished resumes that will make them stand out in
@@ -254,7 +254,7 @@ function Landing() {
           </div>
           <div className="col">
             <img
-              class="div4img mt-5"
+              className="div4img mt-5"
               src={require("./images/div4img.jpeg")}
               alt=""
             />
@@ -328,7 +328,6 @@ function Landing() {
                       <iconify-icon icon="bi:linkedin"></iconify-icon>
                     </a>
                   </li>
-                  <br />
                   <li>
                     <br />
                     <p className="font">Mantra Manas Acharya</p>

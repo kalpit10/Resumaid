@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const userRoute = require("./routes/userRoutes");
+const dbConnect = require("./dbConnect");
 const ResumeParser = require("./resume-parser-master/src");
 const fs = require("fs");
 const multer = require("multer");
@@ -22,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user/", userRoute);
 
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5000");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();

@@ -30,15 +30,13 @@ function FileUpload() {
     e.preventDefault();
     if (file) {
       let data = new FormData();
-      data.append("File", file);
-      data.append("File", file.name);
+      data.append("File", file); // Use "file" as the key
       swal({
         title: "File uploaded successfully",
         icon: "success",
       });
       fetch(
-        "http://localhost:5000/upload",
-        // fetch("https://resumaid.herokuapp.com/upload",
+        "http://localhost:5000/upload", // Check the URL
         {
           method: "POST",
           body: data,
@@ -112,6 +110,7 @@ function FileUpload() {
             className="p-4 font fs-5 ml-3 form-control"
             id="formFile"
             type="file"
+            name="File"
             onChange={handleChange}
             accept=".docx"
           />
