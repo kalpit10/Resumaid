@@ -42,17 +42,6 @@ function Home() {
   ];
   return (
     <div>
-      <meta charSet="UTF-8" />
-      <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>finaldraft</title>
-      <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
-        crossOrigin="anonymous"
-      />
-
       <link rel={landing1} href="finaldraft.css" />
       <nav
         id="navbar-example2"
@@ -71,15 +60,6 @@ function Home() {
 
         <ul className="nav nav-pills ms-auto ">
           <li className="nav-item dropdown">
-            <a
-              className="nav-link dropdown-toggle fs-6 "
-              href="\"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Services
-            </a>
             <ul className="dropdown-menu nav-font fs-5">
               <li>
                 <a className="dropdown-item" href={"/upload"}>
@@ -231,19 +211,7 @@ function Home() {
         </p>
       </div>
       <div id="div4" className="position-relative">
-        <div className="row row-cols-1 row-cols-md-3 g-4 pt-4 px-5 py-3">
-          {/*    <div className="col">
-                  <div className="card h-100">
-                    <img src={require("./images/testimage.jpeg")} className="card-img-top" alt="..." />
-                    <div className="card-body">
-                      <h5 className="card-title text-center font fw-bold">Resume Review</h5>
-                      <p className="card-text font">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                      <button type="button" className="btn btn-info fs-3 text-center" onclick="window.location.href='resumepage.html'">→</button>
-                    </div>
-                  </div>
-        </div>*/}
-
+        <div className="row row-cols-1 row-cols-md-3 pt-4 px-5 py-3">
           <div className="col start-100">
             <div className="card h-100">
               <img
@@ -372,39 +340,9 @@ function Home() {
                   </li>
                 </ul>
               </div>
-              {/*Grid column*/}
-              {/*Grid column*/}
-              {/* <div className="col-lg-3 col-md-6 mb-4 mb-md-0">
-                <h5 className="text-uppercase mb-0">Links</h5>
-                <ul className="list-unstyled">
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 1
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 2
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 3
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 4
-                    </a>
-                  </li>
-                </ul>
-              </div>*/}
-              {/*Grid column*/}
             </div>
-            {/*Grid row*/}
           </div>
-          {/* Grid container */}
-          {/* Copyright */}
+
           <div
             className="text-center p-3"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
