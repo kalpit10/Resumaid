@@ -1,15 +1,13 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
 const csv = require("csv-parser");
 const fs = require("fs");
 const College = require("../models/colleges");
 
-mongoose.connect(
-  "mongodb+srv://kalpit10:w09dHr55mb1k66EL@cluster0.vi4x2q2.mongodb.net/resumaidDB",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const results = [];
 
