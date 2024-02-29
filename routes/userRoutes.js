@@ -3,9 +3,9 @@ const csv = require("csv-parser");
 const User = require("../models/usermodel");
 const College = require("../models/colleges");
 const fs = require("fs");
-const app = express.Router();
+const router = express.Router();
 
-app.post("/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
     const result = await User.findOne({
       username: req.body.username,
@@ -22,7 +22,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   try {
     const newuser = new User(req.body);
     await newuser.save();
@@ -33,7 +33,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/update", async (req, res) => {
+router.post("/update", async (req, res) => {
   try {
     await User.findOneAndUpdate({ _id: req.body._id }, req.body);
     const user = await User.findOne({ _id: req.body._id });
@@ -43,6 +43,4 @@ app.post("/update", async (req, res) => {
   }
 });
 
-
-
-module.exports = app;
+module.exports = router;
