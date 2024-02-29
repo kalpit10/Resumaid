@@ -24,6 +24,7 @@ app.use(express.json());
 // You can use app.use(express.urlencoded({ extended: true })) to parse URL-encoded request bodies.
 app.use(express.urlencoded({ extended: true }));
 
+// /api doesnt matter its just a naming convention. It doesnt matter if you use /api/userRoute or just /userRoute
 app.use("/api/user/", userRoute);
 
 app.use(function (req, res, next) {
