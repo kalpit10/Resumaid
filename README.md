@@ -38,4 +38,4 @@ Bootstrap 5
 
 # Contributors
 
-Name- Kalpit Swami, Lishika Goel, Mantra Manas Acharya
+Name- Kalpit Swami
