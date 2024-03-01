@@ -31,23 +31,27 @@ function FileUpload() {
     if (file) {
       let data = new FormData();
       data.append("File", file); // Use "file" as the key
-      swal({
-        title: "File uploaded successfully",
-        icon: "success",
-      });
-      fetch(
-        "http://localhost:5000/upload", // Check the URL
-        {
-          method: "POST",
-          body: data,
-        }
-      )
-        .then((response) => response.json())
+
+      fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to upload file");
+          }
+          return response.json();
+        })
         .then((data) => {
+          swal({
+            title: "File uploaded successfully",
+            icon: "success",
+          });
           console.log(data);
         })
         .catch((error) => {
           console.error(error);
+          setError("Failed to upload file");
         });
     } else {
       setError("Please select a file to upload");
