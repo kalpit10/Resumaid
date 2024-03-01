@@ -35,15 +35,6 @@ function Landing() {
         </a>
         <ul className="nav nav-pills ms-auto">
           <li className="nav-item dropdown">
-            <a
-              className="nav-link dropdown-toggle fs-6"
-              href="\"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              Services
-            </a>
             <ul className="dropdown-menu nav-font fs-5">
               <li>
                 <a className="dropdown-item" href={"/upload"}>
