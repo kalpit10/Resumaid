@@ -14,7 +14,7 @@ function Profile() {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const result = await axios.post("api/user/update", {
+      const result = await axios.post("http://localhost:5000/api/user/update", {
         ...values,
         _id: user._id,
       });

@@ -10,7 +10,7 @@ function Login() {
   const onFinish = async (values) => {
     setloading(true);
     try {
-      const user = await axios.post("/api/user/login", values);
+      const user = await axios.post("http://localhost:5000/api/user/register", values);
       message.success("Login successfull");
       localStorage.setItem("resume-user", JSON.stringify(user.data));
       setloading(false);

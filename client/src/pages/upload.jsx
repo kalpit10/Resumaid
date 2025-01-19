@@ -8,106 +8,82 @@ function FileUpload() {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
-  const [checkScoreDisabled, setCheckScoreDisabled] = useState(true); // Set the initial value to true
+  const [checkScoreDisabled, setCheckScoreDisabled] = useState(true);
 
+  // Handle file selection
   const handleChange = (e) => {
-    let selected = e.target.files[0];
-    let types = [
+    const selectedFile = e.target.files[0];
+    const allowedTypes = [
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ];
-    if (selected && types.includes(selected.type)) {
-      setFile(selected);
-      setError("");
-      setCheckScoreDisabled(false); // Enable the Check Score button if a file has been selected
+
+    if (selectedFile && allowedTypes.includes(selectedFile.type)) {
+      setFile(selectedFile);
+      setError(null);
+      setCheckScoreDisabled(false); // Enable "Check Score" button
     } else {
       setFile(null);
-      setError("Please select a .docx file");
-      setCheckScoreDisabled(true); // Disable the Check Score button if a file has not been selected or is invalid
+      setError("Please select a valid .docx file.");
+      setCheckScoreDisabled(true); // Disable "Check Score" button
     }
   };
 
-  const handleUpload = (e) => {
+  // Handle file upload
+  const handleUpload = async (e) => {
     e.preventDefault();
-    if (file) {
-      let data = new FormData();
-      data.append("File", file); // Use "file" as the key
 
-      fetch("http://localhost:5000/upload", {
-        method: "POST",
-        body: data,
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to upload file");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          swal({
-            title: "File uploaded successfully",
-            icon: "success",
-          });
-          console.log(data);
-        })
-        .catch((error) => {
-          console.error(error);
-          setError("Failed to upload file");
-        });
-    } else {
-      setError("Please select a file to upload");
+    if (!file) {
+      setError("Please select a file to upload.");
+      return;
     }
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault(); // prevent the default form submit behavior
+    try {
+      // Prepare FormData for upload
+      const formData = new FormData();
+      formData.append("File", file);
 
-    // create a new FormData object
-    const formData = new FormData();
-
-    // append the file to the FormData object
-    formData.append("File", file);
-
-    // send a POST request to the server with the FormData as the body
-    fetch("http://localhost:5000/upload", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        console.log(response);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-        if (data.success) {
-          setCheckScoreDisabled(false); // enable the check score button
-          setError(null); // clear any previous error messages
-        } else {
-          setCheckScoreDisabled(true); // disable the check score button
-          setError(data.message); // display the error message
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        setCheckScoreDisabled(true); // disable the check score button
-        setError("Error uploading file. Please try again."); // display a generic error message
+      // Send POST request to server
+      const response = await fetch("http://localhost:5000/upload", {
+        method: "POST",
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        swal({
+          title: "File uploaded successfully",
+          icon: "success",
+        });
+        console.log("Server Response:", result);
+        setCheckScoreDisabled(false); // Enable "Check Score" button
+        setError(null);
+      } else {
+        throw new Error(result.message || "Unknown error occurred.");
+      }
+    } catch (err) {
+      console.error("Upload Error:", err);
+      setError(err.message || "An error occurred while uploading.");
+      setCheckScoreDisabled(true); // Disable "Check Score" button
+    }
   };
 
   return (
     <DefaultLayout>
       <p className="font fs-4 mt-4 text-center ms-5 ps-5">
-        So, here you are!<br></br> Upload your resume here and get it tested by
-        us.
+        So, here you are!
+        <br /> Upload your resume here and get it tested by us.
       </p>
       <form
         className="position-absolute top-50 start-50 translate-middle mt-5 ms-5"
-        onSubmit={handleSubmit}
+        onSubmit={handleUpload}
       >
         <p className="font fs-6 text-center font-monospace">
-          Upload in .docx format(Resumes crafted with text-based editors only)
+          Upload in .docx format (Resumes crafted with text-based editors only)
         </p>
         <div className="mb-3">
           <input
@@ -120,11 +96,11 @@ function FileUpload() {
           />
         </div>
         <div className="ms-4">
-          {error && <p>{error}</p>}
+          {error && <p className="text-danger">{error}</p>}
           <button
             type="submit"
-            onClick={handleUpload}
             className="btn btn-primary font m-4 btn-lg"
+            disabled={!file} // Disable upload button until a file is selected
           >
             Upload
           </button>
@@ -132,7 +108,7 @@ function FileUpload() {
             type="button"
             onClick={() => navigate("/result")}
             className="btn btn-primary font m-4 btn-lg"
-            disabled={checkScoreDisabled} // Set the disabled attribute based on the checkScoreDisabled state
+            disabled={checkScoreDisabled} // Disable "Check Score" button if no valid upload
           >
             Check Score
           </button>
