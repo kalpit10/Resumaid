@@ -14,14 +14,23 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// app.use(cors());
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
+
+// Allow specific origin and methods
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Allow React app's origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
+  })
+);
 
 app.use(express.json());
 // You can use app.use(express.urlencoded({ extended: true })) to parse URL-encoded request bodies.
@@ -54,7 +63,10 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
 
 //single means single file, for multiple files we say upload.arrays
 //upload.single("Input tag name to be passed in which you are uploading the file")
@@ -64,7 +76,7 @@ app.post("/upload", upload.single("File"), (req, res) => {
     `./resume-parser-master/resumeFiles/compiled`
   )
     .then((file) => {
-      console.log("Yay! " + file);
+      console.log("Yay! The file is inside compiled folder now! " + file);
       //we used readFileSync method because  we cannot require() a json file directly in node.
       const resumeJson = fs.readFileSync(
         `./resume-parser-master/resumeFiles/compiled/${req.file.filename}.json`
@@ -158,4 +170,6 @@ app.get("/colleges", async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const server = app.listen(port, () =>
+  console.log(`Example app listening on port ${port}!`)
+);
