@@ -10,8 +10,11 @@ function Login() {
   const onFinish = async (values) => {
     setloading(true);
     try {
-      const user = await axios.post("http://localhost:5000/api/user/register", values);
-      message.success("Login successfull");
+      const user = await axios.post(
+        "http://localhost:5000/api/user/login",
+        values
+      );
+      message.success("Login successful");
       localStorage.setItem("resume-user", JSON.stringify(user.data));
       setloading(false);
       navigate("/home");
@@ -61,10 +64,6 @@ function Login() {
             rules={[{ required: true, message: "Please input your password!" }]}
           >
             <Input.Password placeholder="Password" />
-          </Form.Item>
-
-          <Form.Item name="remember" valuePropName="checked">
-            <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
           <Form.Item>

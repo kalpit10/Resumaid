@@ -7,15 +7,23 @@ import axios from "axios";
 function Register() {
   const [loading, setloading] = useState(false);
   const navigate = useNavigate();
+
   const onFinish = async (values) => {
     setloading(true);
     try {
+      // Send the registration request to the backend
       await axios.post("http://localhost:5000/api/user/register", values);
       setloading(false);
-      message.success("Registration successfull");
+      message.success("Registration successful");
+      navigate("/login"); // Redirect to login after successful registration
     } catch (error) {
       setloading(false);
-      message.error("Registration failed");
+      // Handle specific backend error messages
+      if (error.response && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
+        message.error("Registration failed");
+      }
     }
   };
 
@@ -56,18 +64,31 @@ function Register() {
 
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[
+              { required: true, message: "Please input your password!" },
+              {
+                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/,
+                message:
+                  "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+              },
+            ]}
           >
             <Input.Password placeholder="Password" />
           </Form.Item>
 
           <Form.Item
             name="confirm-password"
+            dependencies={["password"]}
             rules={[
-              {
-                required: true,
-                message: "Please input your confirmed password!",
-              },
+              { required: true, message: "Please confirm your password!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error("Passwords do not match!"));
+                },
+              }),
             ]}
           >
             <Input.Password placeholder="Confirm Password" />
@@ -82,6 +103,7 @@ function Register() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
+              disabled={loading}
             >
               Register
             </Button>
