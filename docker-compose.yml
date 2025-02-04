@@ -5,8 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
+    env_file:
+      - .env
     environment:
-      - MONGO_URI=mongodb+srv://capstoneproj12:CapstoneProj07@resumaid.lk2p7.mongodb.net/
+      - MONGO_URI=${MONGO_URI}
     depends_on:
       - mongo
 
