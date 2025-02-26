@@ -29,6 +29,7 @@ function Template4() {
               {user.lastname ? user.lastname.toUpperCase() : "Last Name"}
             </b>
           </h1>
+          <h6 className="text-left">Objective</h6>
           <p>{user.objective || "Objective goes here."}</p>
           <br></br>
         </div>
@@ -123,6 +124,24 @@ function Template4() {
                 );
               })}
             </div>
+          )}
+          <br></br>
+          {user.cocurricular.length > 0 && (
+            <section className="interests">
+              <h4>
+                <u>
+                  <b>Co-Curricular Activities</b>
+                </u>
+              </h4>
+              {user.cocurricular.map((activity) => {
+                return (
+                  <div className="d-flex gap-2">
+                    <p>{activity.activity}</p>:
+                    <p className="d-flex">{activity.description}</p>
+                  </div>
+                );
+              })}
+            </section>
           )}
         </div>
 

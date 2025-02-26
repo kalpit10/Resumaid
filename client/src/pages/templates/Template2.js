@@ -27,6 +27,7 @@ function Template2() {
               {user.lastname ? user.lastname.toUpperCase() : "Last Name"}
             </b>
           </h1>
+          <h6 className="text-left">Objective</h6>
           <p>{user.objective || "Objective goes here."}</p>
         </div>
 
@@ -195,13 +196,17 @@ function Template2() {
             {user.certificates.length > 0 && (
               <section className="certificates mb-4">
                 <h4>
-                  <b>Certificates</b>
+                  <u>
+                    <b>Certificates</b>
+                  </u>
                 </h4>
                 {user.certificates.length > 0 ? (
                   user.certificates.map((certificate, index) => (
                     <div key={index} className="mb-3">
                       <h6>
-                        <b>{certificate.name}</b>
+                        <u>
+                          <b>{certificate.name}</b>
+                        </u>
                       </h6>
                       {certificate.link ? (
                         <a
@@ -219,6 +224,24 @@ function Template2() {
                 ) : (
                   <p>No certificates available</p>
                 )}
+              </section>
+            )}
+
+            {user.cocurricular.length > 0 && (
+              <section className="interests">
+                <h4>
+                  <u>
+                    <b>Co-Curricular Activities</b>
+                  </u>
+                </h4>
+                {user.cocurricular.map((activity) => {
+                  return (
+                    <div className="d-flex gap-2">
+                      <p>{activity.activity}</p>:
+                      <p className="d-flex">{activity.description}</p>
+                    </div>
+                  );
+                })}
               </section>
             )}
           </div>

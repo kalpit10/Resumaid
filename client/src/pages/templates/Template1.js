@@ -22,12 +22,13 @@ const Template1 = () => {
   return (
     <Container fluid className="template1-parent">
       {/* Header Section */}
-      <header className="header1 text-center">
-        <h1 className="mb-3">
+      <header className="header1">
+        <h1 className="mb-3 text-center">
           <b>
             {user.firstname.toUpperCase()} {user.lastname.toUpperCase()}
           </b>
         </h1>
+        <h6 className="text-left">Objective</h6>
         <p className="lead">{user.objective}</p>
       </header>
 
@@ -133,6 +134,23 @@ const Template1 = () => {
                 </h4>
                 {user.interests.map((interest) => {
                   return <p>{interest.interests}</p>;
+                })}
+              </section>
+            )}
+            <br></br>
+
+            {user.cocurricular.length > 0 && (
+              <section className="interests">
+                <h4>
+                  <b>Co-Curricular Activities</b>
+                </h4>
+                {user.cocurricular.map((activity) => {
+                  return (
+                    <div className="d-flex gap-2">
+                      <p>{activity.activity}</p>:
+                      <p className="d-flex">{activity.description}</p>
+                    </div>
+                  );
                 })}
               </section>
             )}
