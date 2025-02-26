@@ -1,386 +1,267 @@
 import React from "react";
+import { Container, Button, Carousel } from "react-bootstrap";
+import { ThemeProvider, createTheme } from "@mui/material";
+import { MdEmail, MdPhone } from "react-icons/md";
+import TypeWriter from "typewriter-effect";
 import { useNavigate } from "react-router-dom";
-import landing1 from "../resources/landing.css";
-import "iconify-icon";
+import "../resources/landing.css";
+import Header from "../components/Header";
 
-function Landing() {
+function Home() {
   const navigate = useNavigate();
+
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: {
+        main: "#2196f3",
+      },
+    },
+  });
+
   return (
-    <div>
-      <meta charSet="UTF-8" />
-      <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>finaldraft</title>
-      <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
-        crossOrigin="anonymous"
-      />
+    <ThemeProvider theme={darkTheme}>
+      <div className="home-page bg-dark text-light">
+        {/* Navbar */}
+        <Header />
 
-      <link rel={landing1} href="finaldraft.css" />
-      <nav
-        id="navbar-example2"
-        className="navbar navbar-expand-xl  bg-light px-3 shadow p-3  bg-body  font fs-4 fixed-top"
-      >
-        <a
-          className="navbar-brand position-absolute top-0 end-80"
-          href={"/landing"}
-        >
-          <img
-            src={require("./images/navlogo.jpeg")}
-            alt="Bootstrap"
-            className="px-1 mx-3 navimage"
-          />
-        </a>
-        <ul className="nav nav-pills ms-auto">
-          <li className="nav-item dropdown">
-            <ul className="dropdown-menu nav-font fs-5">
-              <li>
-                <a className="dropdown-item" href={"/upload"}>
-                  Resume review
-                </a>
-              </li>
-              <li>
-                <a className="dropdown-item" href={"/template"}>
-                  Resume/CV templates
-                </a>
-              </li>
-            </ul>
-          </li>
-          <li className="nav-item ">
-            <a className="nav-link navtransition fs-6" href="#div5">
-              About
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className="nav-link navtransition fs-6"
-              //href="javascript: document.body.scrollIntoView(false);"
-              href="#div6"
-            >
-              Contact us
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className="nav-link navtransition fs-6"
-              href={"/login"}
-              target="_self"
-            >
-              Login
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <div id="div1" className="position-relative">
-        <img
-          src={require("./images/logodiv1.jpeg")}
-          alt=""
-          className="rounded mx-auto d-block div1img"
-        />
-        <p className="text-center pt-5 fs-2 fw-normal font div1p">
-          Pick out from professional resume templates, evaluate your resume and
-          Linkedin profile, get suggestions to improve your CV/Resume and much
-          more.
-        </p>
-      </div>
-      <div id="div2" className="position-relative">
-        <video
-          src={require("./images/resumaidvideoreal.ogg")}
-          autoPlay
-          muted
-          loop
-          className="position-absolute top-50 start-50 translate-middle rounded div2video"
-        ></video>
-      </div>
-      <div id="div3" className="position-relative">
-        <div
-          id="carouselExampleDark"
-          className="carousel carousel-dark slide px-5 pt-5"
-          data-bs-ride="carousel"
-        >
-          <div className="carousel-indicators">
-            <button
-              type="button"
-              data-bs-target="#carouselExampleDark"
-              data-bs-slide-to={0}
-              className="active"
-              aria-current="true"
-              aria-label="Slide 1"
-            />
-            <button
-              type="button"
-              data-bs-target="#carouselExampleDark"
-              data-bs-slide-to={1}
-              aria-label="Slide 2"
-            />
-            <button
-              type="button"
-              data-bs-target="#carouselExampleDark"
-              data-bs-slide-to={2}
-              aria-label="Slide 3"
-            />
-          </div>
-
-          <div className=" carousel-inner text-center ">
-            <div className="carousel-item active " data-bs-interval={2000}>
-              <img
-                onClick={() => navigate(`/templates/1`)}
-                src={require("../resources/templateImages/template1.jpg")}
-                className=" mx-auto d-block w-40 caraouselimg hover "
-                alt="..."
+        {/* Hero Section */}
+        <section className="hero vh-100 d-flex align-items-center position-relative">
+          <div className="hero-overlay position-absolute w-100 h-100"></div>
+          <Container className="position-relative">
+            <div className="typewriter-effect">
+              <TypeWriter
+                options={{
+                  strings: [
+                    "Welcome to Resumaid!",
+                    "Free ATS Evaluation",
+                    "Create Your Perfect Resume",
+                    "Get Hired Faster",
+                    "Stand Out in the Job Market",
+                  ],
+                  delay: 70,
+                  autoStart: true,
+                  loop: true,
+                  deleteSpeed: 50,
+                }}
               />
             </div>
 
-            <div className="carousel-item" data-bs-interval={2000}>
-              <img
-                onClick={() => navigate(`/templates/4`)}
-                src={require("../resources/templateImages/template4.jpg")}
-                className="mx-auto d-block w-40 caraouselimg hover"
-                alt="..."
-              />
-            </div>
-
-            <div className="carousel-item" data-bs-interval={2000}>
-              <img
-                onClick={() => navigate(`/templates/6`)}
-                src={require("../resources/templateImages/template6.jpg")}
-                className="mx-auto d-block w-40 caraouselimg hover"
-                alt="..."
-              />
-            </div>
-          </div>
-          <button
-            className="carousel-control-prev"
-            type="button"
-            data-bs-target="#carouselExampleDark"
-            data-bs-slide="prev"
-          >
-            <span className="carousel-control-prev-icon" aria-hidden="true" />
-            <span className="visually-hidden">Previous</span>
-          </button>
-          <button
-            className="carousel-control-next"
-            type="button"
-            data-bs-target="#carouselExampleDark"
-            data-bs-slide="next"
-          >
-            <span className="carousel-control-next-icon" aria-hidden="true" />
-            <span className="visually-hidden">Next</span>
-          </button>
-        </div>
-        <br />
-        <br />
-        <br />
-        <button
-          onClick={() => navigate("/template")}
-          type="button"
-          className="btn btn-primary btn-lg  fs-3 align-middle fw-bolder position-absolute top-50 start-50 translate-middle mt-5 font"
-        >
-          More Templates &gt;&gt;
-        </button>
-        <p className="text-center fs-4 fw-normal font p-5 m-5">
-          <br></br>
-          <br></br>
-          Our Resumaid website offers a wide selection of professional and
-          modern resume templates to choose from. Each template is designed to
-          help you stand out and make a great impression with potential
-          employers. Our templates are easy to use and customizable, you can
-          easily fill in your personal information, education, skills, and
-          experience and generate a polished and customized resume in minutes.
-        </p>
-      </div>
-      <div id="div4" className="position-relative">
-        <div className="row row-cols-1 row-cols-md-3 g-4 pt-4 px-5 py-3">
-          {/*    <div className="col">
-                  <div className="card h-100">
-                    <img src={require("./images/testimage.jpeg")} className="card-img-top" alt="..." />
-                    <div className="card-body">
-                      <h5 className="card-title text-center font fw-bold">Resume Review</h5>
-                      <p className="card-text font">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                      <button type="button" className="btn btn-info fs-3 text-center" onclick="window.location.href='resumepage.html'">→</button>
-                    </div>
-                  </div>
-        </div>*/}
-
-          <div className="col start-100">
-            <div className="card h-100">
-              <img
-                src={require("./images/cardimg.jpeg")}
-                className="card-img-top"
-                alt="..."
-              />
-              <div className="card-body font">
-                <p className="card-title text-center font fw-bold font">
-                  Resume Review
-                </p>
-                <p className="card-text font">
-                  Upload your Resume in .docx format
-                </p>
-                <button
-                  type="button"
-                  className="btn btn-info fs-3 text-center"
-                  onClick={() => navigate("/upload")}
-                >
-                  →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="col">
-            <p className="div4para p-3 m-3 font fw-bold">
-              "Welcome to Resumaid, the ultimate destination for building the
-              perfect resume. Our website is designed to help job seekers create
-              professional and polished resumes that will make them stand out in
-              a competitive job market.
-              <br></br>
-              <br></br> At Resumaid, we believe that a well-crafted resume is
-              key to landing your dream job. That's why we offer a variety of
-              tools and resources to help you create a resume that's tailored to
-              your needs.
+            <p className="lead mb-5">
+              Professional resume templates,and expert suggestions to help you
+              land your dream job.
             </p>
-          </div>
-          <div className="col">
-            <img
-              className="div4img mt-5"
-              src={require("./images/div4img.jpeg")}
-              alt=""
-            />
-          </div>
-        </div>
-      </div>
+            <Button
+              variant="primary"
+              size="lg"
+              href="#templates"
+              className="pulse-button"
+            >
+              Get Started
+            </Button>
+          </Container>
+        </section>
 
-      <div id="div5" className="position-relative">
-        <p className="text-center fs-5 fw-normal font p-5">
-          Our website allows users to browse and select from a range of
-          professional resume templates. Users can easily fill in their personal
-          information, education, skills, and experience, and our system will
-          generate a polished and customized resume in just a matter of minutes.
-          But that's not all - we also offer a resume scanning feature that
-          allows users to upload their existing resume and receive personalized
-          suggestions and a score on how well their resume is currently
-          performing.
-          <br></br>
-          <br></br> We are committed to helping job seekers make the most of
-          their resumes, and we're constantly updating our templates and resume
-          scanning technology to make sure they're up-to-date with the latest
-          trends and best practices in the job market.
-        </p>
-        <img
-          src={require("./images/aboutimage.jpeg")}
-          alt=""
-          className="rounded mx-auto d-block  div5img"
-        />
-      </div>
+        {/* Templates Section */}
+        <section id="templates" className="py-5 bg-dark">
+          <Container>
+            <h2 className="text-center mb-5">Professional Templates</h2>
+            <Carousel className="templates-carousel">
+              <Carousel.Item>
+                <div
+                  className="template-preview"
+                  onClick={() => navigate("/templates/1")}
+                >
+                  <img
+                    src={require("../resources/templateImages/Template-1.png")}
+                    className="img-fluid w-auto object-fit-cover"
+                    alt="Template 1"
+                    style={{ height: "300px" }} // Adjust height as needed
+                    loading="lazy"
+                  />
+                  <h3>Simple Professional</h3>
+                  <p>Clean and traditional layout perfect for any industry</p>
+                </div>
+              </Carousel.Item>
 
-      <div className="div6" id="div6">
-        <footer className="bg-primary text-white text-center text-lg-start">
-          {/* Grid container */}
-          <div className="container p-4">
-            {/*Grid row*/}
-            <div className="row">
-              {/*Grid column*/}
-              <div className="col-lg-6 col-md-12 mb-4 mb-md-0">
-                <p className="font fs-3 p-2">Resumaid</p>
-                <p className="font div4para p-3">
-                  At Resumaid, we value our customers' feedback and are
-                  committed to providing the best possible service. If you have
-                  any questions or concerns about our website or services,
-                  please do not hesitate to reach out to us. We have various
-                  ways you can contact us, and we'll be more than happy to
-                  assist you.
+              <Carousel.Item>
+                <div
+                  className="template-preview"
+                  onClick={() => navigate("/templates/4")}
+                >
+                  <img
+                    src={require("../resources/templateImages/Template-4.png")}
+                    className="img-fluid w-auto object-fit-cover"
+                    alt="Template 4"
+                    style={{ height: "300px" }} // Adjust height as needed
+                    loading="lazy"
+                  />
+                  <h3>Creative Resume</h3>
+                  <p>Contemporary design for creative professionals</p>
+                </div>
+              </Carousel.Item>
+
+              <Carousel.Item>
+                <div
+                  className="template-preview"
+                  onClick={() => navigate("/templates/6")}
+                >
+                  <img
+                    src={require("../resources/templateImages/Template-6.png")}
+                    className="img-fluid w-auto object-fit-cover"
+                    alt="Template 6"
+                    style={{ height: "300px" }} // Adjust height as needed
+                    loading="lazy"
+                  />
+                  <h3>Modern Premium</h3>
+                  <p>Sophisticated layout for senior positions</p>
+                </div>
+              </Carousel.Item>
+            </Carousel>
+            <div className="text-center mt-4">
+              <Button
+                variant="outline-light"
+                size="lg"
+                onClick={() => navigate("/template")}
+              >
+                View All Templates
+              </Button>
+            </div>
+          </Container>
+        </section>
+
+        {/* About Section */}
+        <section id="about" className="py-5 bg-darker">
+          <Container>
+            <div className="row align-items-center">
+              <div className="col-lg-6">
+                <h2 className="mb-4">About Resumaid</h2>
+                <p className="lead mb-4">
+                  Welcome to Resumaid, your ultimate destination for creating
+                  the perfect resume. We combine professional templates to help
+                  you stand out in today's competitive job market.
                 </p>
+                <div className="mt-4">
+                  <h4>Our Features</h4>
+                  <ul className="list-unstyled">
+                    <li className="mb-3">
+                      ✓ Explore 6 Premium Resume Templates for a Professional
+                      and Polished Look
+                    </li>
+                    <li className="mb-3">✓ Expert ATS Suggestions</li>
+                    <li className="mb-3">✓ Easy-to-Use Interface</li>
+                  </ul>
+                </div>
               </div>
-              {/*Grid column*/}
-              {/*Grid column*/}
-              <div className="col-lg-4 col-md-5 mb-4 mb-md-0">
-                <p className="font">Built by - </p>
-                <ul className="list-unstyled mb-0">
-                  <li>
-                    <br></br>
-                    <p className="font">Kalpit Swami</p>
+              <div className="col-lg-6">
+                <div className="about-image-container">
+                  <div className="about-image-placeholder bg-gradient">
+                    <img
+                      src={require("../resources/templateImages/Template-1_HD.png")}
+                      alt="About Resumes"
+                      className=" w-100"
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Contact Section */}
+        <section id="contact" className="py-5 bg-dark">
+          <Container>
+            <div className="row">
+              <div className="col-lg-6">
+                <h2 className="mb-4">Contact Us</h2>
+                <p className="lead mb-4">
+                  Have questions? We're here to help! Reach out to our team for
+                  support or feedback.
+                </p>
+                <div className="contact-info">
+                  <div className="d-flex align-items-center mb-3">
+                    <MdEmail className="me-2 fs-4" />
+                    <span>support@resumaid.com</span>
+                  </div>
+                  <div className="d-flex align-items-center mb-3">
+                    <MdPhone className="me-2 fs-4" />
+                    <span>+1 (234) 567-8900</span>
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <h4 className="mb-4">Our Team</h4>
+                <div className="team-members">
+                  <div className="team-member mb-3">
+                    <h5 className="mb-1">Kalpit Swami</h5>
+                    <p className="mb-2">Full Stack Developer</p>
                     <a
                       href="https://www.linkedin.com/in/kalpit-swami-7a4554204/"
-                      className="text-white font footericons"
+                      className="btn btn-outline-light btn-sm"
                     >
-                      <iconify-icon icon="bi:linkedin"></iconify-icon>
+                      LinkedIn Profile
                     </a>
-                  </li>
-                  <br />
-                  <li>
-                    <p className="font">Lishika Goel</p>
+                  </div>
+
+                  <div className="team-member mb-3">
+                    <h5 className="mb-1">Rafique Roberts</h5>
+                    <p className="mb-2">Penetration Tester</p>
                     <a
-                      href="https://www.linkedin.com/in/lishika-goel-1638b5205/"
-                      className="text-white font footericons"
+                      href="https://www.linkedin.com/in/rafique-roberts-8b2b2b21a/"
+                      className="btn btn-outline-light btn-sm"
                     >
-                      <iconify-icon icon="bi:linkedin"></iconify-icon>
+                      LinkedIn Profile
                     </a>
-                  </li>
-                  <li>
-                    <br />
-                    <p className="font">Mantra Manas Acharya</p>
+                  </div>
+                  <div className="team-member mb-3">
+                    <h5 className="mb-1">Hardik Dagar</h5>
+                    <p className="mb-2">Security Analyst</p>
                     <a
-                      href="https://www.linkedin.com/in/manas-acharya-971aaa219/"
-                      className="text-white font footericons"
+                      href="https://www.linkedin.com/in/hardik-dagar/"
+                      className="btn btn-outline-light btn-sm"
                     >
-                      <iconify-icon
-                        className="footericons"
-                        icon="bi:linkedin"
-                      ></iconify-icon>
+                      LinkedIn Profile
                     </a>
-                  </li>
-                </ul>
+                  </div>
+                  <div className="team-member mb-3">
+                    <h5 className="mb-1">Navdeep Tura</h5>
+                    <p className="mb-2">Security Project Manager</p>
+                    <a
+                      href="https://www.linkedin.com/in/navdeep-tura-63a48922/"
+                      className="btn btn-outline-light btn-sm"
+                    >
+                      LinkedIn Profile
+                    </a>
+                  </div>
+                  <div className="team-member mb-3">
+                    <h5 className="mb-1">Parameswara Reddy</h5>
+                    <p className="mb-2">Threat Intelligence Analyst</p>
+                    <button className="btn btn-outline-light btn-sm">
+                      LinkedIn Profile
+                    </button>
+                  </div>
+                </div>
               </div>
-              {/*Grid column*/}
-              {/*Grid column*/}
-              {/* <div className="col-lg-3 col-md-6 mb-4 mb-md-0">
-                <h5 className="text-uppercase mb-0">Links</h5>
-                <ul className="list-unstyled">
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 1
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 2
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 3
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#!" className="text-white">
-                      Link 4
-                    </a>
-                  </li>
-                </ul>
-              </div>*/}
-              {/*Grid column*/}
             </div>
-            {/*Grid row*/}
-          </div>
-          {/* Grid container */}
-          {/* Copyright */}
-          <div
-            className="text-center p-3"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
-          >
-            © Copyright:
-            <script>document.write(new Date().getFullYear())</script>
-            <p className="text-white font">RESUMAID</p>
-          </div>
-          {/* Copyright */}
+          </Container>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-darker py-4">
+          <Container className="text-center">
+            <p className="mb-0 d-flex justify-content-center">
+              <div className="me-2">© {new Date().getFullYear()}</div>
+              <div className="cursor" onClick={() => navigate("/")}>
+                Resumaid.
+              </div>
+              All rights reserved.
+            </p>
+          </Container>
         </footer>
       </div>
-      <div></div>
-    </div>
+    </ThemeProvider>
   );
 }
 
-export default Landing;
+export default Home;

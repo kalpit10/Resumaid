@@ -17,7 +17,7 @@ function Login() {
       message.success("Login successful");
       localStorage.setItem("resume-user", JSON.stringify(user.data));
       setloading(false);
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       setloading(false);
       message.error("Login failed");
@@ -30,7 +30,7 @@ function Login() {
 
   useEffect(() => {
     if (localStorage.getItem("resume-user")) {
-      navigate("/home");
+      navigate("/");
     }
   });
 

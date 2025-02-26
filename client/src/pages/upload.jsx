@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DefaultLayout from "../components/DefaultLayout";
 import "../resources/upload.css";
 import swal from "sweetalert";
+import Header from "../components/Header";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { CloudUpload, Assessment } from "@mui/icons-material";
 
 function FileUpload() {
   const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [checkScoreDisabled, setCheckScoreDisabled] = useState(true);
 
   // Handle file selection
@@ -73,48 +76,79 @@ function FileUpload() {
   };
 
   return (
-    <DefaultLayout>
-      <p className="font fs-4 mt-4 text-center ms-5 ps-5">
-        So, here you are!
-        <br /> Upload your resume here and get it tested by us.
-      </p>
-      <form
-        className="position-absolute top-50 start-50 translate-middle mt-5 ms-5"
-        onSubmit={handleUpload}
-      >
-        <p className="font fs-6 text-center font-monospace">
-          Upload in .docx format (Resumes crafted with text-based editors only)
-        </p>
-        <div className="mb-3">
-          <input
-            className="p-4 font fs-5 ml-3 form-control"
-            id="formFile"
-            type="file"
-            name="File"
-            onChange={handleChange}
-            accept=".docx"
-          />
-        </div>
-        <div className="ms-4">
-          {error && <p className="text-danger">{error}</p>}
-          <button
-            type="submit"
-            className="btn btn-primary font m-4 btn-lg"
-            disabled={!file} // Disable upload button until a file is selected
-          >
-            Upload
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/result")}
-            className="btn btn-primary font m-4 btn-lg"
-            disabled={checkScoreDisabled} // Disable "Check Score" button if no valid upload
-          >
-            Check Score
-          </button>
-        </div>
-      </form>
-    </DefaultLayout>
+    <div>
+      <Header />
+      <br />
+      <br />
+      <br />
+      <Container className="upload-container py-5 mt-5">
+        <Row className="justify-content-center">
+          <Col md={8} lg={6}>
+            <div className="text-center mb-5">
+              <h1 className="display-5 mb-3">Resume Evaluation</h1>
+              <p className="lead text-muted">
+                Upload your resume and get instant ATS feedback
+              </p>
+            </div>
+
+            <Form onSubmit={handleUpload}>
+              <div
+                className={`upload-area ${isDragging ? "dragging" : ""} ${
+                  file ? "has-file" : ""
+                }`}
+              >
+                <Form.Control
+                  type="file"
+                  onChange={handleChange}
+                  accept=".docx"
+                  className="file-input"
+                />
+                <div className="upload-content">
+                  <CloudUpload className="upload-icon" />
+                  <p className="upload-text">
+                    {file
+                      ? file.name
+                      : "Drag & drop your resume here or click to browse"}
+                  </p>
+                  <p className="upload-hint">
+                    Accepts .docx format (Text-based editors only)
+                  </p>
+                </div>
+              </div>
+
+              {error && (
+                <Alert variant="danger" className="mt-3">
+                  {error}
+                </Alert>
+              )}
+
+              <div className="d-flex justify-content-center gap-3 mt-4">
+                <Button
+                  variant="primary"
+                  type="submit"
+                  size="lg"
+                  className="d-flex align-items-center"
+                  disabled={!file}
+                >
+                  <CloudUpload className="me-2" />
+                  Upload Resume
+                </Button>
+                <Button
+                  variant="outline-primary"
+                  size="lg"
+                  onClick={() => navigate("/result")}
+                  className="d-flex align-items-center"
+                  disabled={checkScoreDisabled}
+                >
+                  <Assessment className="me-2" />
+                  Check Score
+                </Button>
+              </div>
+            </Form>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 }
 
