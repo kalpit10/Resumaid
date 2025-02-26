@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { useNavigate, useParams } from "react-router-dom";
-import DefaultLayout from "../../components/DefaultLayout";
+import Header from "../../components/Header";
 import Template1 from "./Template1";
 import Template2 from "./Template2";
 import { Button } from "antd";
@@ -42,7 +42,11 @@ function Templates() {
     }
   };
   return (
-    <DefaultLayout>
+    <div>
+      <Header />
+      <br />
+      <br />
+      <br />
       <div className="d-flex justify-content-end my-5 mx-5">
         <Button className="btn1" onClick={() => navigate("/template")}>
           Back
@@ -52,7 +56,7 @@ function Templates() {
         </Button>
       </div>
       <div ref={componentRef}>{getTemplate()}</div>
-    </DefaultLayout>
+    </div>
   );
 }
 
