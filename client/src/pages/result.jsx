@@ -13,8 +13,8 @@ function Result() {
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(null);
-  const [positives, setPositives] = useState([]); // ✅ Stores positive feedback
-  const [suggestions, setSuggestions] = useState([]); // ✅ Stores improvement suggestions
+  const [positives, setPositives] = useState([]); //  Stores positive feedback
+  const [suggestions, setSuggestions] = useState([]); //  Stores improvement suggestions
 
   const handleGetResults = async () => {
     setIsLoading(true);
@@ -74,7 +74,7 @@ function Result() {
                   animate={{ opacity: 1 }}
                 >
                   <div className="score-content">
-                    {/* ✅ Circular Score Indicator */}
+                    {/* Circular Score Indicator */}
                     <div className="score-circle-wrapper">
                       <motion.div
                         className="score-circle"
@@ -104,24 +104,70 @@ function Result() {
                       <h2>ATS Compatibility Score</h2>
                     </div>
 
-                    {/* ✅ Positive Feedback (Green Cards) */}
-                    <div className="suggestions-grid">
-                      {positives.map((positive, index) => (
-                        <motion.div
-                          key={index}
-                          className="suggestion-card success"
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.2 + index * 0.1 }}
-                        >
-                          <CheckCircle className="suggestion-icon" />
-                          <h3>Well Done!</h3>
-                          <p>{positive}</p>
-                        </motion.div>
-                      ))}
-                    </div>
+                    {/* Dynamic Message Based on Score */}
+                    {score >= 85 ? (
+                      <motion.div
+                        className="congratulations-message text-center mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <h2 className="text-success">🎉 Congratulations! 🎉</h2>
+                        <p className="text-muted">
+                          Your resume is highly optimized! Great job ensuring
+                          it's ATS-friendly.
+                        </p>
+                      </motion.div>
+                    ) : score >= 50 && score <= 80 ? (
+                      <motion.div
+                        className="encouragement-message text-center mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <h2 className="text-primary">Keep Improving! 💡</h2>
+                        <p className="text-muted">
+                          Your resume is decent, but there are areas to enhance
+                          for better ATS compatibility.
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        className="serious-message text-center mb-4"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        <h2 className="text-danger">
+                          ⚠ Needs Significant Improvement
+                        </h2>
+                        <p className="text-muted">
+                          Your resume lacks key ATS optimization elements.
+                          Review the suggestions to improve it.
+                        </p>
+                      </motion.div>
+                    )}
 
-                    {/* ⚠ Improvement Suggestions (Yellow Cards) */}
+                    {/* Positive Feedback (Green Cards) */}
+                    {positives.length > 0 && (
+                      <div className="suggestions-grid">
+                        {positives.map((positive, index) => (
+                          <motion.div
+                            key={index}
+                            className="suggestion-card success"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.2 + index * 0.1 }}
+                          >
+                            <CheckCircle className="suggestion-icon" />
+                            <h3>Well Done!</h3>
+                            <p>{positive}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Improvement Suggestions (Yellow Cards) */}
                     <div className="suggestions-grid">
                       {suggestions.map((suggestion, index) => (
                         <motion.div

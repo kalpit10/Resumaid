@@ -1,6 +1,6 @@
 async function Score() {
   let suggestions = [];
-  let positives = []; // ✅ New array to store positive messages
+  let positives = []; // New array to store positive messages
   let score = 0;
 
   try {
@@ -81,7 +81,7 @@ async function Score() {
 
     score = Math.floor((score / 105) * 100); // Convert score to percentage
 
-    return { score, positives, suggestions }; // ✅ Return both positives & suggestions
+    return { score, positives, suggestions }; // Return both positives & suggestions
   } catch (error) {
     console.error(error);
     return { score: 0, positives: [], suggestions: ["Error fetching data"] };
