@@ -1,9 +1,289 @@
-.imgresult{
-    height: 400px;
-    width: 550px;
+/* Result Page Styles */
+.result-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
-.backicn{
-    font-size: 60px;
-    filter: drop-shadow(3px 2px 2px rgb(0 0 0 / 0.4));
+/* Back Button */
+.back-button-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.back-button {
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+  padding: 0;
+}
+
+.back-button:hover {
+  color: #212529;
+}
+
+/* Result Content */
+.result-content {
+  position: relative;
+  padding: 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.result-content:hover {
+  transform: translateY(-5px);
+}
+
+/* Image Styles */
+.result-image-wrapper {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+.result-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  transition: transform 0.5s ease;
+}
+
+.result-image-wrapper:hover .result-image {
+  transform: scale(1.05);
+}
+
+.result-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+/* Get Results Button */
+.get-results-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.get-results-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.get-results-button:disabled {
+  background: #007bff;
+  border-color: #007bff;
+  opacity: 0.8;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.get-results-button:disabled {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .result-content {
+    padding: 1rem;
+  }
+
+  .get-results-button {
+    width: 100%;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .result-image {
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 576px) {
+  .result-content {
+    margin: 1rem;
+  }
+
+  .back-button {
+    font-size: 1rem;
+  }
+}
+
+/* Score Section */
+.score-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.score-content {
+  text-align: center;
+}
+
+.score-circle-wrapper {
+  margin-bottom: 3rem;
+}
+
+.score-circle {
+  width: 200px;
+  height: 200px;
+  position: relative;
+  margin: 0 auto 1.5rem;
+}
+
+.score-circle svg {
+  transform: rotate(-90deg);
+}
+
+.score-circle circle {
+  fill: none;
+  stroke-width: 8;
+}
+
+.score-background {
+  stroke: #e9ecef;
+}
+
+.score-indicator {
+  stroke: #4caf50;
+  stroke-linecap: round;
+}
+
+.score-value {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  font-weight: bold;
+  color: #2196f3;
+}
+
+.score-circle-wrapper h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Suggestions Grid */
+.suggestions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.suggestion-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: left;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.suggestion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-card.success svg {
+  color: #4caf50;
+}
+.suggestion-card.warning svg {
+  color: #ffc107;
+}
+.suggestion-card.info svg {
+  color: #2196f3;
+}
+
+.suggestion-card svg {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.suggestion-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.suggestion-card p {
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .score-circle {
+    width: 150px;
+    height: 150px;
+  }
+
+  .score-value {
+    font-size: 2rem;
+  }
+
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .result-page {
+    background: white;
+  }
+
+  .score-section {
+    box-shadow: none;
+  }
+
+  .action-buttons {
+    display: none;
+  }
 }
