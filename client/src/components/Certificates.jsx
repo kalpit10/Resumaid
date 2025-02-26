@@ -31,7 +31,7 @@ function Certificates() {
             <div className="row">
               {fields.map(({ key, name, label, ...restField }) => (
                 <>
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <Form.Item
                       {...restField}
                       name={[name, "name"]}
@@ -94,7 +94,7 @@ function Certificates() {
             <div className="row">
               {fields.map(({ key, name, label, ...restField }) => (
                 <>
-                  <div className="col-md-3">
+                  <div className="col-md-4">
                     <Form.Item
                       {...restField}
                       name={[name, "name"]}
