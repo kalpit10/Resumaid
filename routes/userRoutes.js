@@ -113,11 +113,20 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Update user profile
 router.post("/update", async (req, res) => {
   try {
-    await User.findOneAndUpdate({ _id: req.body._id }, req.body);
-    const user = await User.findOne({ _id: req.body._id });
-    res.send(user);
+    const user = await User.findOneAndUpdate(
+      { _id: req.body._id },
+      req.body,
+      { new: true } // Ensures the updated document is returned
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.send(user); // Send the updated user data back to the frontend
   } catch (error) {
     res.status(400).json(error);
   }
