@@ -15,12 +15,15 @@ function ExperienceProjects() {
           <>
             <div className="row">
               {fields.map(({ key, name, label, ...restField }) => (
-                <>
-                  <div className="col-md-3">
+                <div key={key} className="row gx-2 mb-3">
+                  {" "}
+                  {/* Added Bootstrap Row & Spacing */}
+                  {/* Designation */}
+                  <div className="col-12 col-md-6 col-lg-3">
                     <Form.Item
                       {...restField}
                       name={[name, "designation"]}
-                      label={[label, "Designation"]}
+                      label="Designation"
                       rules={[
                         {
                           required: true,
@@ -31,11 +34,12 @@ function ExperienceProjects() {
                       <Input placeholder="Designation" />
                     </Form.Item>
                   </div>
-                  <div className="col-md-3">
+                  {/* Company Name */}
+                  <div className="col-12 col-md-6 col-lg-3">
                     <Form.Item
                       {...restField}
                       name={[name, "company"]}
-                      label={[label, "Company name"]}
+                      label="Company Name"
                       rules={[
                         {
                           required: true,
@@ -46,46 +50,71 @@ function ExperienceProjects() {
                       <Input placeholder="Company" />
                     </Form.Item>
                   </div>
-                  <div className="col-md-2">
+                  {/* Address */}
+                  <div className="col-12 col-md-6 col-lg-3">
                     <Form.Item
                       {...restField}
                       name={[name, "place"]}
-                      label={[label, "Address of the company"]}
+                      label="Company Address"
                       rules={[
                         {
                           required: true,
-                          message: "Missing place",
+                          message: "Missing Address",
                         },
                       ]}
                     >
                       <Input placeholder="Place" />
                     </Form.Item>
                   </div>
-                  <div className="col-md-2">
+                  {/* Year Range */}
+                  <div className="col-12 col-md-6 col-lg-3">
                     <Form.Item
                       {...restField}
                       name={[name, "range"]}
-                      label={[label, "Year Range"]}
+                      label="Year Range"
                       rules={[
                         {
                           required: true,
-                          message: "Missing year range",
+                          message: "Missing Year Range",
                         },
                       ]}
                     >
                       <Input placeholder="Year Range" />
                     </Form.Item>
                   </div>
-                  <div className="col-md-2">
+                  {/* Work Description (Full Width) */}
+                  <div className="col-12">
+                    <Form.Item
+                      {...restField}
+                      name={[name, "description"]}
+                      label="Work Experience Description"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Missing Description",
+                        },
+                      ]}
+                    >
+                      <TextArea placeholder="Work Experience Description" />
+                    </Form.Item>
+                  </div>
+                  {/* Remove Button (Centered) */}
+                  <div className="col-12 d-flex justify-content-end">
                     <MinusCircleOutlined
-                      style={{ fontSize: 23, color: "tomato" }}
+                      style={{
+                        fontSize: 23,
+                        color: "tomato",
+                        cursor: "pointer",
+                      }}
                       onClick={() => remove(name)}
                     />
                   </div>
-                </>
+                </div>
               ))}
             </div>
-            <Form.Item>
+
+            {/* Add Experience Button */}
+            <Form.Item className="text-center">
               <Button
                 type="dashed"
                 onClick={() => add()}

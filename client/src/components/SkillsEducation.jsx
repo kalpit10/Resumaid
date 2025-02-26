@@ -12,15 +12,15 @@ function SkillsEducation() {
   const qualification = [
     {
       label: "Under-graduate",
-      value: "undergraduate",
+      value: "Undergraduate",
     },
     {
       label: "Post-graduate",
-      value: "postgraduate",
+      value: "Postgraduate",
     },
     {
       label: "Diploma",
-      value: "diploma",
+      value: "Diploma",
     },
   ];
 
