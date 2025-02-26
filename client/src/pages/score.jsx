@@ -1,109 +1,90 @@
-import swal from "sweetalert";
-
 async function Score() {
   let suggestions = [];
+  let positives = []; // ✅ New array to store positive messages
   let score = 0;
 
   try {
     const response = await fetch("http://localhost:5000/result");
-    // const response = await fetch("https://resumaid.herokuapp.com/result");
     const data = await response.json();
 
     if (data.objective) {
-      score = score + 10;
+      score += 10;
+      positives.push("✔ Objective is included");
     } else {
-      var sug1 = "\n   Write an objective\n\n";
-      suggestions.push(sug1);
+      suggestions.push("Write an objective\n\n");
     }
 
     if (data.skills) {
-      score = score + 10;
+      score += 10;
+      positives.push("✔ Skills are well mentioned");
     } else {
-      var sug2 = "  Write some skills\n\n";
-      suggestions.push(sug2);
-    }
-    if (data.courses || data.certifications || data.certification) {
-      score = score + 5;
-    } else {
-      var sug3 = "  Mention some courses or certifications\n\n";
-      suggestions.push(sug3);
-    }
-    if (data.projects) {
-      score = score + 20;
-    } else {
-      var sug4 = " Mention some projects\n\n";
-      suggestions.push(sug4);
-    }
-    if (data.experience || data.workexperience) {
-      score = score + 30;
-    } else {
-      var sug5 = "  Write some experiences\n\n";
-      suggestions.push(sug5);
-    }
-    if (data.cocurricular || data.hobbies) {
-      score = score + 5;
-    } else {
-      var sug6 = "  Mention some co-curricular activities\n\n";
-      suggestions.push(sug6);
-    }
-    if (data.interests || data.achievements || data.achievement) {
-      score = score + 5;
-    } else {
-      var sug7 = "  Write some interests and achievements\n\n";
-      suggestions.push(sug7);
+      suggestions.push("Write some skills\n\n");
     }
 
-    if (data.education) {
+    if (data.courses || data.certifications || data.certification) {
       score += 5;
+      positives.push("✔ Certifications/Courses are included");
     } else {
-      var sug8 =
-        "Mention your education background if work experience is less than 2 years \n\n";
-      suggestions.push(sug8);
+      suggestions.push("Mention some courses or certifications\n\n");
+    }
+
+    if (data.projects) {
+      score += 20;
+      positives.push("✔ Projects are listed");
+    } else {
+      suggestions.push("Mention some projects\n\n");
+    }
+
+    if (data.experience || data.workexperience) {
+      score += 30;
+      positives.push("✔ Work experience is provided");
+    } else {
+      suggestions.push("Write some experiences\n\n");
+    }
+
+    if (
+      data.interests ||
+      data.achievements ||
+      data.achievement ||
+      data["co-curricular"] ||
+      data.hobbies ||
+      data.activities
+    ) {
+      score += 5;
+      positives.push("✔ Interests/Co-curricular activities are included");
+    } else {
+      suggestions.push(
+        "Write some interests/achievements/co-curricular/hobbies/activities\n\n"
+      );
+    }
+
+    if (data.education || data.Education) {
+      score += 5;
+      positives.push("✔ Education details are mentioned");
+    } else {
+      suggestions.push("Mention your education background\n\n");
     }
 
     if (data.email) {
-      score = score + 5;
+      score += 5;
+      positives.push("✔ Email is included");
     } else {
-      var sug9 = "Provide an e-mail \n\n";
-      suggestions.push(sug9);
+      suggestions.push("Provide an e-mail \n\n");
     }
 
     if (data.profiles || data.profile) {
-      score = score + 10;
+      score += 15;
+      positives.push("✔ Profile links (e.g., LinkedIn) are added");
     } else {
-      var sug10 = "Mention any profile(LinkedIn Recommended)\n\n";
-      suggestions.push(sug10);
+      suggestions.push("Mention any profile (LinkedIn Recommended)\n\n");
     }
 
-    score = Math.floor((score / 105) * 100);
-    let removeComma = () => {
-      swal({
-        title: "Your score is " + score + "%",
-        icon: "success",
-        buttons: {
-          cancel: "Go back",
-          catch: {
-            text: "Suggestions",
-            value: "catch",
-          },
-        },
-      }).then((value) => {
-        switch (value) {
-          case "catch":
-            swal({
-              title: "Here are some suggestions to improve your resume:",
-              text: suggestions.join(" "),
-            });
-            break;
+    score = Math.floor((score / 105) * 100); // Convert score to percentage
 
-          default:
-            swal("Thank you for using Resumaid!");
-        }
-      });
-    };
-    removeComma();
+    return { score, positives, suggestions }; // ✅ Return both positives & suggestions
   } catch (error) {
     console.error(error);
+    return { score: 0, positives: [], suggestions: ["Error fetching data"] };
   }
 }
 
