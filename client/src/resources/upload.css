@@ -1,19 +1,108 @@
-.imgupld {
-  max-width: 100%;
-  height: auto;
+/* Upload container styles */
+.upload-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
 }
 
-@media (min-width: 768px) {
-  .imgupld {
-    max-width: 500px;
-    height: 400px;
+.upload-area {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  border: 2px dashed #dee2e6;
+  border-radius: 1rem;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.upload-area:hover {
+  border-color: var(--bs-primary);
+  background: #f8f9fa;
+}
+
+.upload-area.dragging {
+  border-color: var(--bs-primary);
+  background: rgba(13, 110, 253, 0.1);
+  transform: scale(1.02);
+}
+
+.upload-area.has-file {
+  border-color: #198754;
+  background: rgba(25, 135, 84, 0.1);
+}
+
+.file-input {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.upload-icon {
+  font-size: 4rem !important;
+  color: var(--bs-primary);
+  margin-bottom: 1rem;
+}
+
+.upload-text {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #212529;
+}
+
+.upload-hint {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* Button animations */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
   }
 }
 
-@media (max-width: 767px) {
-  .font {
-    font-size: 1.2rem; /* adjust the font size as needed */
-    padding: 0.2rem; /* adjust the padding as needed */
-    margin-bottom: 0rem;
+.upload-area.dragging .upload-icon {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .upload-area {
+    min-height: 200px;
+  }
+
+  .upload-text {
+    font-size: 1rem;
+  }
+
+  .d-flex.justify-content-center {
+    flex-direction: column;
+  }
+
+  .d-flex.justify-content-center button {
+    width: 100%;
+    margin-bottom: 1rem;
   }
 }
