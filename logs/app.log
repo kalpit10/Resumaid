@@ -1,0 +1,36 @@
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-07T00:47:09.494Z","username":"hardik12"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: Incorrect password","timestamp":"2025-02-07T00:51:24.591Z","username":"hardik12"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:51:50.158Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:00.726Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:01.366Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:02.003Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:02.645Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:03.360Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T00:53:03.975Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T01:03:44.661Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T01:03:46.247Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T01:03:47.596Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T01:03:48.759Z","username":"hardik121"}
+{"ip":"::1","level":"warn","message":"Failed login attempt: User not found","timestamp":"2025-02-07T01:03:49.883Z","username":"hardik121"}
+{"ip":"::1","level":"error","message":"ACCOUNT LOCKED: Too many failed login attempts","timestamp":"2025-02-07T01:03:51.026Z","username":"hardik121"}
+{"ip":"::1","level":"error","message":"ACCOUNT LOCKED: Too many failed login attempts","timestamp":"2025-02-07T01:03:56.693Z","username":"hardik121"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-07T01:04:21.434Z","username":"hardik12"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-07T01:05:54.195Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-07T01:09:05.069Z","username":"kalpit121"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-07T01:09:46.931Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-17T03:17:46.825Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-17T03:27:26.584Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-17T03:27:46.177Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-17T20:14:29.791Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-17T20:16:20.205Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-18T23:53:14.722Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-24T23:32:31.667Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-25T00:38:18.980Z","username":"kalpit121"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-25T00:51:25.105Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-26T19:33:21.775Z","username":"kalpit.pvt10"}
+{"ip":"::1","level":"info","message":"User logged in successfully","timestamp":"2025-02-26T19:41:01.120Z","username":"kalpit.pvt10"}
+{"level":"info","message":"User logged in successfully","timestamp":"2025-03-09T03:55:45.509Z","username":"kalpit.pvt10"}
+{"level":"warn","message":"Failed login attempt: Incorrect password","timestamp":"2025-03-09T04:04:16.182Z","username":"kalpit.pvt10"}
+{"level":"warn","message":"Failed login attempt: Incorrect password","timestamp":"2025-03-09T04:06:19.631Z","username":"kalpit.pvt10"}
+{"level":"warn","message":"Failed login attempt: Incorrect password","timestamp":"2025-03-09T04:06:29.006Z","username":"kalpit.pvt10"}
+{"level":"warn","message":"Failed login attempt: Incorrect password","timestamp":"2025-03-09T04:12:22.949Z","username":"kalpit.pvt10"}

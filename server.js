@@ -14,30 +14,15 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
-// app.use(cors());
-
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   next();
-// });
-
-// Allow specific origin and methods
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Allow React app's origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
-  })
-);
+// A05: Security Misconfiguration - Allow all origins (CORS vulnerability)
+app.use(cors()); // No restrictions, open to all origins
 
 app.use(express.json());
 // You can use app.use(express.urlencoded({ extended: true })) to parse URL-encoded request bodies.
 app.use(express.urlencoded({ extended: true }));
 
-// /api doesnt matter its just a naming convention. It doesnt matter if you use /api/userRoute or just /userRoute
-app.use("/api/user/", userRoute);
+// A01: Broken Access Control - No authentication checks, exposing API endpoints
+app.use("/api/user/", userRoute); // Any user can access without authentication
 
 app.use(function (req, res, next) {
   if (req.path === "/result" || req.path === "/colleges") {
@@ -50,22 +35,21 @@ app.set("view engine", "ejs");
 
 //---------------MULTER UPLOAD SECTION-------------------------
 
+// A08: Unrestricted File Upload - Allows any file type, no size restriction
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     //null(no errors), "destination"
     cb(null, "./resume-parser-master/resumeFiles/");
   },
-
   filename: (req, file, cb) => {
     console.log(file);
     //we extend and grab the name of the file
-    cb(null, Date.now() + path.extname(file.originalname));
+    cb(null, Date.now() + path.extname(file.originalname)); // ❌ Keeps original filename (can lead to RCE)
   },
 });
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 });
 
 //single means single file, for multiple files we say upload.arrays
@@ -168,6 +152,11 @@ app.get("/colleges", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
+});
+
+// A05: Expose Sensitive Information - Sends stack trace errors in responses
+app.use((err, req, res, next) => {
+  res.status(500).send(err.stack); //  Full error messages exposed
 });
 
 const server = app.listen(port, () =>

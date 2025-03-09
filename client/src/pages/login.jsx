@@ -1,31 +1,38 @@
 import React, { useEffect, useState } from "react";
 import "./../resources/authentication.css";
-import { Button, Checkbox, Form, Input, message, Spin } from "antd";
+import { Button, Form, Input, message, Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
   const [loading, setloading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // ❌ Stores detailed errors
+
   const navigate = useNavigate();
+
   const onFinish = async (values) => {
     setloading(true);
     try {
-      const user = await axios.post(
+      const response = await axios.post(
         "http://localhost:5000/api/user/login",
         values
       );
       message.success("Login successful");
-      localStorage.setItem("resume-user", JSON.stringify(user.data));
+      localStorage.setItem("resume-user", JSON.stringify(response.data));
       setloading(false);
       navigate("/");
     } catch (error) {
       setloading(false);
-      message.error("Login failed");
-    }
-  };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
+      // A05: Security Misconfiguration - Display raw backend error
+      if (error.response) {
+        setErrorMessage(error.response.data); // Displays exact server response
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+
+      message.error(errorMessage); // Exposes detailed error message
+    }
   };
 
   useEffect(() => {
@@ -37,18 +44,11 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-box">
-        {/* <div className="illustration-wrapper">
-          <img
-            src="https://mixkit.imgix.net/art/preview/mixkit-left-handed-man-sitting-at-a-table-writing-in-a-notebook-27-original-large.png?q=80&auto=format%2Ccompress&h=700"
-            alt="Login"
-          />
-        </div> */}
         {loading && <Spin size="large" />}
         <Form
           name="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
         >
           <p className="form-title">Welcome back</p>
           <p>Login to the Dashboard</p>
@@ -65,6 +65,13 @@ function Login() {
           >
             <Input.Password placeholder="Password" />
           </Form.Item>
+
+          {/* A07: Reveals exact login failure reason */}
+          {errorMessage && (
+            <p className="error-text" style={{ color: "red" }}>
+              {errorMessage}
+            </p>
+          )}
 
           <Form.Item>
             <Button
