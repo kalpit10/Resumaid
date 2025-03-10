@@ -1,30 +1,38 @@
 const express = require("express");
 // const csv = require("csv-parser");
 const User = require("../models/usermodel");
+const jwt = require("jsonwebtoken"); 
 const logger = require("../logger");
 // const College = require("../models/colleges");
 // const fs = require("fs");
 const router = express.Router();
 
 
+// 🔴 Weak Secret Key (Hardcoded instead of using .env)
+const SECRET_KEY = "12345";
+
 
 router.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // A03: NoSQL Injection - No sanitization of input
+    // NoSQL Injection Risk - No input sanitization
     const user = await User.findOne({ username });
 
-    // A07: No Brute-Force Protection - No rate limiting or account lockout
+    // No Brute-Force Protection
     if (!user) {
       return res.status(400).json("Login failed: User does not exist");
     }
 
-    // A02: Cryptographic Failures - Password stored in plaintext
-    if (user.password === password) { // ❌ Plaintext comparison (no hashing)
+    // A02: Password stored in plaintext (No Hashing)
+    if (user.password === password) { // Insecure password check
       logger.info(`User logged in successfully`, { username });
 
-      res.send(user); // Exposes full user data (potential PII leak)
+      // Generate JWT without Expiry (Session Hijacking)
+      const token = jwt.sign({ userId: user._id, username: user.username, role: "user" }, SECRET_KEY);
+
+      // Expose Token and Full User Data
+      res.json({ message: "Login successful", token, user });
     } else {
       logger.warn(`Failed login attempt: Incorrect password`, { username });
 
