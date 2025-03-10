@@ -6,32 +6,37 @@ import axios from "axios";
 
 function Login() {
   const [loading, setloading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // ❌ Stores detailed errors
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
     setloading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/user/login",
-        values
-      );
+      const response = await axios.post("http://localhost:5000/api/user/login", values);
       message.success("Login successful");
+
+      const token = response.data.token;
+
+      // Store JWT In LocalStorage (XSS Risk)
       localStorage.setItem("resume-user", JSON.stringify(response.data));
+
+      // Log JWT to Console (Attackers Can Steal It)
+      console.log("JWT Token:", token);
+
       setloading(false);
       navigate("/");
     } catch (error) {
       setloading(false);
 
-      // A05: Security Misconfiguration - Display raw backend error
+      // Exposes Backend Errors (Security Misconfiguration)
       if (error.response) {
-        setErrorMessage(error.response.data); // Displays exact server response
+        setErrorMessage(error.response.data);
       } else {
         setErrorMessage("An unexpected error occurred.");
       }
 
-      message.error(errorMessage); // Exposes detailed error message
+      message.error(errorMessage);
     }
   };
 
@@ -45,40 +50,22 @@ function Login() {
     <div className="login-page">
       <div className="login-box">
         {loading && <Spin size="large" />}
-        <Form
-          name="login-form"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-        >
+        <Form name="login-form" initialValues={{ remember: true }} onFinish={onFinish}>
           <p className="form-title">Welcome back</p>
           <p>Login to the Dashboard</p>
-          <Form.Item
-            name="username"
-            rules={[{ required: true, message: "Please input your username!" }]}
-          >
+          <Form.Item name="username" rules={[{ required: true, message: "Please input your username!" }]}>
             <Input placeholder="Username" />
           </Form.Item>
 
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: "Please input your password!" }]}
-          >
+          <Form.Item name="password" rules={[{ required: true, message: "Please input your password!" }]}>
             <Input.Password placeholder="Password" />
           </Form.Item>
 
-          {/* A07: Reveals exact login failure reason */}
-          {errorMessage && (
-            <p className="error-text" style={{ color: "red" }}>
-              {errorMessage}
-            </p>
-          )}
+          {/* Displays Exact Error Message - Useful for Attackers */}
+          {errorMessage && <p className="error-text" style={{ color: "red" }}>{errorMessage}</p>}
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="login-form-button"
-            >
+            <Button type="primary" htmlType="submit" className="login-form-button">
               LOGIN
             </Button>
             <Link to="/register">Click here to Register</Link>
