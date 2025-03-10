@@ -16,7 +16,6 @@ const logger = winston.createLogger({
     new winston.transports.MongoDB({
       db: process.env.MONGODB_URI, // MongoDB connection string
       collection: "logs", // Name of the collection in MongoDB
-      options: { useUnifiedTopology: true },
     }),
 
     // Display logs in console (for debugging)
