@@ -15,8 +15,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // A05: Security Misconfiguration - Allow all origins (CORS vulnerability)
-app.use(cors()); // No restrictions, open to all origins
-
+app.use(cors({ origin: "*", credentials: true }));
 app.use(express.json());
 // You can use app.use(express.urlencoded({ extended: true })) to parse URL-encoded request bodies.
 app.use(express.urlencoded({ extended: true }));
