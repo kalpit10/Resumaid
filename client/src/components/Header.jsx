@@ -10,9 +10,8 @@ function Header() {
   const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const user = JSON.parse(
-    localStorage.getItem("resume-user") || '{"username": "Guest"}'
-  );
+  const userData = JSON.parse(localStorage.getItem("resume-user") || "{}");
+  const user = userData.user || { username: "Guest" }; // ✅ Get `user` object from stored data
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
