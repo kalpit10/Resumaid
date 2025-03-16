@@ -11,7 +11,7 @@ function Header() {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const userData = JSON.parse(localStorage.getItem("resume-user") || "{}");
-  const user = userData.user || { username: "Guest" }; // ✅ Get `user` object from stored data
+  const username = userData.username || "Guest"; // ✅ Directly get `username`
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -64,7 +64,7 @@ function Header() {
                   onClick={handleMenu}
                   startIcon={<AccountCircle />}
                 >
-                  {user.username}
+                  {username}
                 </Button>
                 <Menu
                   anchorEl={anchorEl}
@@ -82,7 +82,7 @@ function Header() {
                     Resume Review
                   </MenuItem>
 
-                  {user.username === "Guest" ? (
+                  {username === "Guest" ? (
                     <MenuItem onClick={handleLogin}>Login</MenuItem>
                   ) : (
                     <MenuItem onClick={handleLogout}>Logout</MenuItem>
