@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema(
     firstname: { type: String, default: "" },
     lastname: { type: String, default: "" },
     email: { type: String, default: "" },
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockoutUntil: { type: Date, default: null },
     mobileNumber: { type: String, default: "" },
     portfolio: { type: String, default: "" },
     objective: { type: String, default: "" },
