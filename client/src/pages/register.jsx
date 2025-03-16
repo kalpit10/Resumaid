@@ -3,6 +3,7 @@ import "./../resources/authentication.css";
 import { Button, Checkbox, Form, Input, message, Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import bcrypt from "bcryptjs"; // Encrypt password before sending
 
 function Register() {
   const [loading, setloading] = useState(false);
@@ -11,15 +12,22 @@ function Register() {
   const onFinish = async (values) => {
     setloading(true);
     try {
+      // Encrypt password before sending
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(values.password, salt);
+
       // Send the registration request to the backend
-      await axios.post("http://localhost:5000/api/user/register", values);
+      await axios.post("http://localhost:5000/api/user/register", {
+        username: values.username,
+        password: hashedPassword, // Send encrypted password
+      });
       setloading(false);
       message.success("Registration successful");
       navigate("/login"); // Redirect to login after successful registration
     } catch (error) {
       setloading(false);
       // Handle specific backend error messages
-      if (error.response && error.response.data.message) {
+      if (error.response?.data?.message) {
         message.error(error.response.data.message);
       } else {
         message.error("Registration failed");
@@ -33,9 +41,9 @@ function Register() {
 
   useEffect(() => {
     if (localStorage.getItem("resume-user")) {
-      navigate("/home");
+      navigate("/");
     }
-  });
+  }, []);
 
   return (
     <div className="login-page">
@@ -97,7 +105,7 @@ function Register() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
-              disabled={loading}
+              disabled={loading} // Prevent Multiple Submissions
             >
               Register
             </Button>
