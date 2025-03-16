@@ -1,72 +1,164 @@
 const express = require("express");
+require("dotenv").config();
 // const csv = require("csv-parser");
 const User = require("../models/usermodel");
-const jwt = require("jsonwebtoken"); 
+const jwt = require("jsonwebtoken");
 const logger = require("../logger");
+const authenticationMiddleware = require("../middlewares/authMiddleware");
+const bcrypt = require("bcryptjs");
+const rateLimit = require("express-rate-limit");
+
 // const College = require("../models/colleges");
 // const fs = require("fs");
+
 const router = express.Router();
 
+const SECRET_KEY = process.env.SECRET_KEY;
 
-// 🔴 Weak Secret Key (Hardcoded instead of using .env)
-const SECRET_KEY = "12345";
+if (!SECRET_KEY) {
+  console.error("FATAL ERROR: SECRET_KEY is not defined!");
+  process.exit(1); // Stop the server if the secret key is missing here.
+}
 
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // Lockout of 15 minutes per IP
+  max: 5, // Max 3 login attempts per IP
+  message: "Too many login attempts from this IP. Try again later.",
+  standardHeaders: true, // Sends `RateLimit-*` headers in response
+  legacyHeaders: false, // Disable deprecated headers
+  handler: (req, res) => {
+    logger.warn("Rate limit exceeded for login", { ip: req.ip });
+    res
+      .status(429)
+      .json({ message: "Too many login attempts. Try again later." });
+  },
+});
 
-router.post("/login", async (req, res) => {
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // NoSQL Injection Risk - No input sanitization
-    const user = await User.findOne({ username });
+    // Sanitizing username field
+    const user = await User.findOne()
+      .setOptions({ sanitizeFilter: true })
+      .where("username")
+      .equals(username);
 
-    // No Brute-Force Protection
     if (!user) {
       return res.status(400).json("Login failed: User does not exist");
     }
 
-    // A02: Password stored in plaintext (No Hashing)
-    if (user.password === password) { // Insecure password check
-      logger.info(`User logged in successfully`, { username });
-
-      // Generate JWT without Expiry (Session Hijacking)
-      const token = jwt.sign({ userId: user._id, username: user.username, role: "user" }, SECRET_KEY);
-
-      // Expose Token and Full User Data
-      res.json({ message: "Login successful", token, user });
-    } else {
-      logger.warn(`Failed login attempt: Incorrect password`, { username });
-
-      res.status(400).json("Login failed: Incorrect password");
+    // Check if the account is locked FIRST
+    if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+      const timeLeft = Math.ceil((user.lockoutUntil - new Date()) / 60000);
+      return res.status(403).json({
+        message: `Too many failed attempts. Try again in ${timeLeft} minutes.`,
+      });
     }
+
+    // Compare entered password with stored hash
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      user.failedLoginAttempts += 1;
+
+      // Lock out user after 3 failed attempts
+      if (user.failedLoginAttempts >= 3) {
+        user.lockoutUntil = new Date(Date.now() + 2 * 60 * 1000); // Lock for 2 min
+        await user.save();
+
+        logger.warn("Account locked due to multiple failed logins", {
+          username: user.username,
+          ip: req.ip,
+        });
+
+        return res.status(403).json({
+          message: `Too many failed attempts. Account locked for 2 minutes.`,
+        });
+      }
+
+      await user.save();
+      logger.warn(`Failed login attempt: Invalid credentials`, { username });
+      return res.status(400).json("Login failed: Invalid Credentials");
+    }
+
+    // Reset failed attempts on successful login
+    user.failedLoginAttempts = 0;
+    user.lockoutUntil = null;
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id, username: user.username, role: "user" },
+      process.env.SECRET_KEY,
+      { expiresIn: "30m" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true, // Protects against XSS
+      secure: process.env.NODE_ENV === "production", // Secure in production
+      sameSite: "Strict", // Prevents CSRF
+      maxAge: 30 * 60 * 1000, // 30 minutes expiration
+    });
+
+    logger.info(`User logged in successfully`, { username });
+    return res.json({ message: "Login successful", username: user.username });
   } catch (error) {
     logger.error(`Login API Error`, { error });
-    res.status(500).json("An error occurred");
+    return res.status(500).json("An error occurred");
   }
 });
-
 
 router.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Check if the username already exists
-    const existingUser = await User.findOne({ username });
+    // Secure Username Validation (Prevents NoSQL Injection)
+    const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
+    if (!usernameRegex.test(username)) {
+      return res.status(400).json({
+        message:
+          "Username must be 4-20 characters and contain only letters, numbers, or underscores.",
+      });
+    }
+
+    // Prevent NoSQL Injection by Sanitizing Input
+    const existingUser = await User.findOne()
+      .setOptions({ sanitizeFilter: true })
+      .where("username")
+      .equals(username);
+
     if (existingUser) {
       return res.status(400).json({ message: "Username is already taken" });
     }
 
-    // Password validation
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/;
-    if (!passwordRegex.test(password)) {
+    // Dynamic Password Validation
+    const passwordRules = [
+      { regex: /(?=.*[A-Z])/, message: "at least one uppercase letter" },
+      { regex: /(?=.*\d)/, message: "at least one number" },
+      {
+        regex: /(?=.*[!@#$%^&*()_\-+=<>?])/,
+        message: "at least one special character",
+      },
+      { regex: /.{8,}/, message: "a minimum length of 8 characters" },
+    ];
+
+    const failedRules = passwordRules
+      .filter((rule) => !rule.regex.test(password))
+      .map((rule) => rule.message);
+
+    if (failedRules.length) {
       return res.status(400).json({
-        message:
-          "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+        message: `Password must contain: ${failedRules.join(", ")}.`,
       });
     }
 
-    // Create and save the new user
-    const newUser = new User({ username, password });
+    // Secure Password Hashing with Salt Rounds from .env
+    const saltRounds = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Save User with Hashed Password
+    const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
     res.json({ message: "Registration successful" });
@@ -76,19 +168,24 @@ router.post("/register", async (req, res) => {
 });
 
 // Update user profile
-router.post("/update", async (req, res) => {
+// What is the role of authMiddleware here?
+// Ensures only logged-in users can access /update
+// Uses req.user.userId from JWT instead of trusting frontend input
+// Rejects expired or invalid tokens
+// Users cannot update another user’s profile
+router.post("/update", authenticationMiddleware, async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
-      { _id: req.body._id },
+      { _id: req.user.userId }, // Now updates only the authenticated user's profile
       req.body,
-      { new: true } // Ensures the updated document is returned
+      { new: true }
     );
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.send(user); // Send the updated user data back to the frontend
+    res.json(user);
   } catch (error) {
     res.status(400).json(error);
   }
