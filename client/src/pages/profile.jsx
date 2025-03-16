@@ -7,35 +7,50 @@ import Certificates from "../components/Certificates";
 import Interests from "../components/Interests";
 import axios from "axios";
 import Header from "../components/Header";
+import { useNavigate } from "react-router-dom";
 
 function Profile() {
-  const [userData, setUserData] = useState(
-    JSON.parse(localStorage.getItem("resume-user"))
-  );
+  const [userData, setUserData] = useState(null);
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setUserData(JSON.parse(localStorage.getItem("resume-user"))); // Update user state when localStorage changes
+    axios
+      .get("http://localhost:5000/api/user/profile", { withCredentials: true })
+      .then((response) => {
+        setUserData(response.data); // Store user data securely in state
+      })
+      .catch((error) => {
+        console.error("Failed to fetch user data", error);
+      });
   }, []);
+
+  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const result = await axios.post("http://localhost:5000/api/user/update", {
-        ...values,
-        _id: userData._id,
-      });
+      const result = await axios.post(
+        "http://localhost:5000/api/user/update",
+        values, // backend should get it from JWT
+        { withCredentials: true }
+      );
 
       if (result.data) {
-        localStorage.setItem("resume-user", JSON.stringify(result.data));
-        // window.location.reload(); //Hard reload to re-map updated data in local storage
+        setUserData(result.data); // Update user data in state
+        message.success("Profile updated successfully");
       }
-      console.log(result.data);
       setLoading(false);
-      message.success("Profile updated successfully");
     } catch (error) {
       setLoading(false);
-      message.error("Profile updation failed");
+
+      if (error.response?.status === 401) {
+        message.error("Session expired. Please login again!");
+        localStorage.removeItem("resume-user"); // Clearing old session
+        navigate("/login");
+      } else {
+        message.error("Profile update failed");
+      }
     }
   };
 
