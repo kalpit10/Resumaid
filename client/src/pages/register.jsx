@@ -3,40 +3,29 @@ import "./../resources/authentication.css";
 import { Button, Checkbox, Form, Input, message, Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import bcrypt from "bcryptjs"; // Encrypt password before sending
 
 function Register() {
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
-    setloading(true);
+    setLoading(true);
     try {
-      // Encrypt password before sending
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(values.password, salt);
-
-      // Send the registration request to the backend
+      // Send the registration request to the backend (NO HASHING HERE)
       await axios.post("http://localhost:5000/api/user/register", {
         username: values.username,
-        password: hashedPassword, // Send encrypted password
+        password: values.password, // Send plaintext password (backend will hash)
       });
-      setloading(false);
+
+      setLoading(false);
       message.success("Registration successful");
       navigate("/login"); // Redirect to login after successful registration
     } catch (error) {
-      setloading(false);
+      setLoading(false);
       // Handle specific backend error messages
-      if (error.response?.data?.message) {
-        message.error(error.response.data.message);
-      } else {
-        message.error("Registration failed");
-      }
+      const errorMsg = error.response?.data?.message || "Registration failed";
+      message.error(errorMsg);
     }
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
   };
 
   useEffect(() => {
@@ -53,10 +42,10 @@ function Register() {
           name="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
         >
           <p className="form-title">Welcome</p>
           <p>Kindly Register and then Login to the Dashboard</p>
+
           <Form.Item
             name="username"
             rules={[{ required: true, message: "Please input your username!" }]}
@@ -105,7 +94,7 @@ function Register() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
-              disabled={loading} // Prevent Multiple Submissions
+              disabled={loading}
             >
               Register
             </Button>
