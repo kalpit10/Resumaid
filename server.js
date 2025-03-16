@@ -9,19 +9,60 @@ const path = require("path");
 const College = require("./models/colleges");
 const resumeData = require("./models/resume");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const mongoSanitize = require("express-mongo-sanitize");
+const helmet = require("helmet");
 
 const app = express();
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
-// A05: Security Misconfiguration - Allow all origins (CORS vulnerability)
-app.use(cors({ origin: "*", credentials: true }));
+const allowedOrigins = ["http://localhost:3000"]; //  Only allow frontend domains
+
+// Securing HTTP Headers to Prevent Clickjacking, XSS, and Security Misconfigurations
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    frameguard: { action: "deny" }, // Prevents clickjacking
+    noSniff: true, // Prevents MIME-type sniffing
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // HSTS Preloading
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    hidePoweredBy: true, // Hides 'X-Powered-By' header
+  })
+);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS policy violation: Origin not allowed"));
+      }
+    },
+    credentials: true, // Allow cookies only for trusted origins
+    methods: ["GET", "POST", "PUT", "DELETE"], // Restrict allowed methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Restrict headers
+    optionsSuccessStatus: 200, // Handle preflight requests properly
+  })
+);
+
+app.use(mongoSanitize()); // all user inputs will be automatically sanitized before reaching MongoDB.
+
+app.use(cookieParser()); // Enables reading cookies from requests
+
 app.use(express.json());
 // You can use app.use(express.urlencoded({ extended: true })) to parse URL-encoded request bodies.
 app.use(express.urlencoded({ extended: true }));
 
-// A01: Broken Access Control - No authentication checks, exposing API endpoints
-app.use("/api/user/", userRoute); // Any user can access without authentication
+app.use("/api/user/", userRoute);
 
 app.use(function (req, res, next) {
   if (req.path === "/result" || req.path === "/colleges") {
@@ -34,7 +75,6 @@ app.set("view engine", "ejs");
 
 //---------------MULTER UPLOAD SECTION-------------------------
 
-// A08: Unrestricted File Upload - Allows any file type, no size restriction
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     //null(no errors), "destination"
@@ -43,12 +83,13 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     console.log(file);
     //we extend and grab the name of the file
-    cb(null, Date.now() + path.extname(file.originalname)); // ❌ Keeps original filename (can lead to RCE)
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
 const upload = multer({
   storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
 });
 
 //single means single file, for multiple files we say upload.arrays
@@ -151,11 +192,6 @@ app.get("/colleges", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   }
-});
-
-// A05: Expose Sensitive Information - Sends stack trace errors in responses
-app.use((err, req, res, next) => {
-  res.status(500).send(err.stack); //  Full error messages exposed
 });
 
 const server = app.listen(port, () =>
