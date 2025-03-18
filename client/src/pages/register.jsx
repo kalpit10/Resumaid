@@ -58,9 +58,9 @@ function Register() {
             rules={[
               { required: true, message: "Please input your password!" },
               {
-                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{8,}$/,
+                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{16,}$/,
                 message:
-                  "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character",
+                  "Password must be at least 16 characters long, include an uppercase letter, a number, and a special character",
               },
             ]}
           >
