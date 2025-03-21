@@ -5,105 +5,150 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Login() {
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [lockoutTimer, setLockoutTimer] = useState(null);
+  const [rateLimitTimer, setRateLimitTimer] = useState(null);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
-    setloading(true);
+    setLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:5000/api/user/login",
-        values,
-        { withCredentials: true } // Sends cookie with request
+        {
+          username: values.username,
+          password: values.password,
+          otp: mfaRequired ? otp : undefined,
+        },
+        { withCredentials: true }
       );
+
       message.success("Login successful");
 
       const userData = {
-        username: response.data.username, // Ensure username is stored
+        username: response?.data?.username,
       };
       localStorage.setItem("resume-user", JSON.stringify(userData));
 
-      setloading(false);
+      setLoading(false);
       navigate("/");
     } catch (error) {
-      setloading(false);
+      setLoading(false);
 
-      // 403  = Access Forbidden
-      if (error.response?.status === 403) {
-        const errorMsg = error.response.data.message;
-        setErrorMessage(errorMsg);
+      if (!error.response) {
+        message.error("An unexpected error occurred. Please try again.");
+        return;
+      }
 
-        // Extracting remaining minutes from message
-        const timeLeftMatch = errorMsg.match(/\d+/);
-        if (timeLeftMatch) {
-          const timeLeft = parseInt(timeLeftMatch[0], 10) * 60; // Convert minutes to seconds
-          setLockoutTimer(timeLeft);
+      const status = error.response.status;
+      const errorMsg = error.response?.data?.message || "Login failed.";
+      setErrorMessage(errorMsg);
 
-          // Start countdown timer
-          const interval = setInterval(() => {
-            setLockoutTimer((prev) => {
-              if (prev + 1) return prev - 1;
-              clearInterval(interval);
-              return null; // reset wehn countdown reaches 0
-            });
-          }, 1000);
+      if (errorMsg === "OTP is required for MFA") {
+        setMfaRequired(true);
+        return;
+      }
+
+      if (status === 403) {
+        const timeMatch = errorMsg.match(/\d+/);
+        if (timeMatch && timeMatch[0]) {
+          const seconds = parseInt(timeMatch[0], 10) * 60;
+          if (!isNaN(seconds)) setLockoutTimer(seconds);
         }
+      } else if (status === 429) {
+        const retryAfter = error.response.data?.retryAfter;
+        const retrySeconds = parseInt(retryAfter, 10) || 120;
+        setRateLimitTimer(retrySeconds);
       } else {
-        message.error("Login failed. Check your credentials.");
+        message.error("Login failed. Invalid credentials.");
       }
     }
   };
 
   useEffect(() => {
+    if (lockoutTimer === null) return;
+    const interval = setInterval(() => {
+      setLockoutTimer((prev) => {
+        if (prev > 1) return prev - 1;
+        clearInterval(interval);
+        return null;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutTimer]);
+
+  useEffect(() => {
+    if (rateLimitTimer === null) return;
+    const interval = setInterval(() => {
+      setRateLimitTimer((prev) => {
+        if (prev > 1) return prev - 1;
+        clearInterval(interval);
+        return null;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [rateLimitTimer]);
+
+  useEffect(() => {
     const user = JSON.parse(localStorage.getItem("resume-user") || "{}");
-    if (user.username) {
+    if (user?.username) {
       navigate("/");
     }
-  }, []);
+  }, [navigate]);
+
+  const isDisabled = lockoutTimer !== null || rateLimitTimer !== null;
 
   return (
     <div className="login-page">
       <div className="login-box">
         {loading && <Spin size="large" />}
-        <Form
-          name="login-form"
-          initialValues={{ remember: true }}
-          onFinish={onFinish}
-        >
+        <Form name="login-form" onFinish={onFinish}>
           <p className="form-title">Welcome back</p>
           <p>Login to the Dashboard</p>
+
           <Form.Item
             name="username"
             rules={[{ required: true, message: "Please input your username!" }]}
           >
-            <Input placeholder="Username" disabled={lockoutTimer !== null} />
+            <Input placeholder="Username" disabled={isDisabled} />
           </Form.Item>
 
           <Form.Item
             name="password"
             rules={[{ required: true, message: "Please input your password!" }]}
           >
-            <Input.Password
-              placeholder="Password"
-              disabled={lockoutTimer !== null}
-            />
+            <Input.Password placeholder="Password" disabled={isDisabled} />
           </Form.Item>
 
-          {/* Displays Exact Error Message - Useful for Attackers
-          {errorMessage && (
-            <p className="error-text" style={{ color: "red" }}>
-              {errorMessage}
-            </p>
-          )} */}
+          {mfaRequired && (
+            <Form.Item
+              name="otp"
+              rules={[{ required: true, message: "Please input your OTP!" }]}
+            >
+              <Input
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+            </Form.Item>
+          )}
 
           {lockoutTimer !== null && (
             <p className="error-text" style={{ color: "red" }}>
-              Too many failed attempts. Try again in{" "}
-              {Math.floor(lockoutTimer / 60)}:
-              {(lockoutTimer % 60).toString().padStart(2, "0")} minutes.{" "}
+              Account Locked. Try again in {Math.floor(lockoutTimer / 60)}:
+              {(lockoutTimer % 60).toString().padStart(2, "0")} minutes.
+            </p>
+          )}
+
+          {rateLimitTimer !== null && (
+            <p className="error-text" style={{ color: "red" }}>
+              Rate limit exceeded. Try again in{" "}
+              {Math.floor(rateLimitTimer / 60)}:
+              {(rateLimitTimer % 60).toString().padStart(2, "0")} minutes.
             </p>
           )}
 
@@ -112,7 +157,7 @@ function Login() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
-              disabled={lockoutTimer !== null}
+              disabled={isDisabled}
             >
               LOGIN
             </Button>

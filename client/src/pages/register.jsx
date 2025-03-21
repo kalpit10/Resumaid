@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react";
 import "./../resources/authentication.css";
-import { Button, Checkbox, Form, Input, message, Spin } from "antd";
+import { Button, Checkbox, Form, Input, message, Modal, Spin } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function Register() {
   const [loading, setLoading] = useState(false);
+
+  // State to control MFA modal visibility
+  const [showMfaModal, setShowMfaModal] = useState(false);
+
+  // Store registered username to use later (e.g, for /enable-mfa)
+  const [registeredUsername, setRegisteredUsername] = useState("");
+
   const navigate = useNavigate();
 
   const onFinish = async (values) => {
@@ -19,7 +26,8 @@ function Register() {
 
       setLoading(false);
       message.success("Registration successful");
-      navigate("/login"); // Redirect to login after successful registration
+      setRegisteredUsername(values.username);
+      setShowMfaModal(true);
     } catch (error) {
       setLoading(false);
       // Handle specific backend error messages
@@ -58,7 +66,8 @@ function Register() {
             rules={[
               { required: true, message: "Please input your password!" },
               {
-                pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{16,}$/,
+                pattern:
+                  /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=<>?]).{16,}$/,
                 message:
                   "Password must be at least 16 characters long, include an uppercase letter, a number, and a special character",
               },
@@ -101,6 +110,39 @@ function Register() {
             <Link to="/login">Click here to Login</Link>
           </Form.Item>
         </Form>
+
+        {/* MFA Prompt Modal */}
+        <Modal
+          open={showMfaModal}
+          title="Enable Two-Factor Authentication"
+          onCancel={() => navigate("/login")}
+          footer={[
+            <Button key="skip" onClick={() => navigate("/login")}>
+              ⏭️ Skip for Now
+            </Button>,
+            <Button
+              key="enable"
+              type="primary"
+              onClick={() => {
+                // Store username so EnableMFA can access it
+                localStorage.setItem(
+                  "resume-user",
+                  JSON.stringify({ username: registeredUsername })
+                );
+                navigate("/enable-mfa");
+              }}
+            >
+              ✅ Enable MFA
+            </Button>,
+          ]}
+        >
+          <p>
+            For enhanced security, we recommend enabling Two-Factor
+            Authentication (MFA). This adds an extra layer of protection to your
+            account by requiring a 6-digit code from an authenticator app in
+            addition to your password.
+          </p>
+        </Modal>
       </div>
     </div>
   );
