@@ -11,6 +11,7 @@ import Templates from "./pages/templates";
 import Landing from "./pages/landing";
 import Upload from "./pages/upload";
 import Result from "./pages/result";
+import EnableMFA from "./pages/EnableMFA";
 function App() {
   return (
     <div className="App">
@@ -45,6 +46,7 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/enable-mfa" element={<EnableMFA />} />
           <Route
             path="/upload"
             element={
