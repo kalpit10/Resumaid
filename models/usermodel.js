@@ -4,6 +4,8 @@ const userSchema = new mongoose.Schema(
   {
     username: { type: String, required: true },
     password: { type: String, required: true },
+    mfaEnabled: { type: Boolean, default: false },
+    mfaSecret: { type: String, default: "" }, // Stores the TOTP secret key
     firstname: { type: String, default: "" },
     lastname: { type: String, default: "" },
     email: { type: String, default: "" },
