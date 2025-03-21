@@ -2,6 +2,8 @@ const express = require("express");
 require("dotenv").config();
 // const csv = require("csv-parser");
 const User = require("../models/usermodel");
+const speakeasy = require("speakeasy");
+const QRCode = require("qrcode");
 const jwt = require("jsonwebtoken");
 const logger = require("../logger");
 const authenticationMiddleware = require("../middlewares/authMiddleware");
@@ -23,28 +25,105 @@ if (!SECRET_KEY) {
 // Setting dynamic salt rounds for bcrypt hashing
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS) || 12;
 
+// Randomized Delay to prevent bots like Hydra
+const randomizedDelay = async () => {
+  const min = 500;
+  const max = 3000;
+  const delayTime = Math.floor(Math.random() * (max - min + 1) + min);
+  return new Promise((resolve) => setTimeout(resolve, delayTime));
+};
+
+// Exponential Lockout Mechanism
+const BASE_LOCKOUT_TIME = 2 * 60 * 1000;
+const LOCKOUT_MULTIPLIER = 2;
+
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Lockout of 15 minutes per IP
-  max: 5, // Max 3 login attempts per IP
+  windowMs: 2 * 60 * 1000, // Lockout of 2 minutes per IP
+  max: 5, // Max 5 login attempts per IP
   message: "Too many login attempts from this IP. Try again later.",
   standardHeaders: true, // Sends `RateLimit-*` headers in response
   legacyHeaders: false, // Disable deprecated headers
-  keyGenerator: (req) => req.body.username, // Limits per username instead of IP
+  keyGenerator: (req) => `${req.ip}_${req.body.username}`, // Limits per username instead of IP
   handler: (req, res) => {
     logger.warn("Rate limit exceeded for login", {
       username: req.body.username,
       ip: req.ip,
     });
 
-    res
-      .status(429)
-      .json({ message: "Too many login attempts. Try again later." });
+    res.status(429).json({
+      error: "rate_limit",
+      message: "Limit exceeded. Try again later.",
+      retryAfter:
+        Math.ceil((req.rateLimit.resetTime - Date.now()) / 1000) || 120, // Adjust to 120 seconds
+    });
   },
+});
+
+// Enable MFA for a user (generates secret and QR code)
+router.post("/enable-mfa", async (req, res) => {
+  try {
+    const { username } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Generate MFA secret
+    const secret = speakeasy.generateSecret({
+      name: `Resumaid (${username})`, // App name for Google Authenticator
+    });
+
+    // Store secret in DB
+    user.mfaSecret = secret.base32;
+    user.mfaEnabled = true;
+    await user.save();
+
+    // Generate QR code from otpauth URL
+    QRCode.toDataURL(secret.otpauth_url, (err, qrCodeDataURL) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Failed to generate QR code" });
+      }
+
+      res.json({
+        qrCode: qrCodeDataURL, // Image to display in frontend
+      });
+    });
+  } catch (error) {
+    console.error("MFA Setup Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.post("/verify-mfa", async (req, res) => {
+  try {
+    const { username, token } = req.body;
+
+    const user = await User.findOne({ username });
+    if (!user || !user.mfaSecret) {
+      return res.status(404).json({ message: "User or MFA not found" });
+    }
+
+    const isVerified = speakeasy.totp.verify({
+      secret: user.mfaSecret,
+      encoding: "base32",
+      token,
+      window: 1, // 30 sec window on either side
+    });
+
+    if (!isVerified) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    return res.json({ message: "MFA verified successfully" });
+  } catch (error) {
+    console.error("MFA verification error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 router.post("/login", loginLimiter, async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, otp } = req.body;
 
     // Sanitizing username field
     const user = await User.findOne()
@@ -53,10 +132,11 @@ router.post("/login", loginLimiter, async (req, res) => {
       .equals(username);
 
     if (!user) {
-      logger.warn(`Login failed: User does not exist - ${username}`, {
+      logger.warn(`Login failed. Invalid credentials - ${username}`, {
         ip: req.ip,
       });
-      return res.status(400).json("Login failed: Invalid Credentials");
+      await randomizedDelay();
+      return res.status(400).json("Login failed. Invalid Credentials");
     }
 
     // Check if the account is locked due to failed attempts
@@ -70,8 +150,6 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
     // Compare entered password with stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -79,22 +157,43 @@ router.post("/login", loginLimiter, async (req, res) => {
 
       // Lock out user after 3 failed attempts
       if (user.failedLoginAttempts >= 3) {
-        user.lockoutUntil = new Date(Date.now() + 2 * 60 * 1000); // Lock for 2 minutes
+        const lockoutTime =
+          BASE_LOCKOUT_TIME *
+          Math.pow(LOCKOUT_MULTIPLIER, user.failedLoginAttempts - 3); // Exponential Lockout time increase after certain attempts
+        user.lockoutUntil = new Date(Date.now() + lockoutTime);
         await user.save();
         logger.warn(
-          `Account locked after multiple failed attempts: ${username}`,
-          { ip: req.ip }
+          `Account locked after ${user.failedLoginAttempts} failed attempts`,
+          { username, ip: req.ip }
         );
-        return res.status(403).json({
-          message: "Too many failed attempts. Account locked for 2 minutes.",
-        });
+        return res
+          .status(403)
+          .json("Invalid credentials or account temporarily locked.");
       }
 
       await user.save();
       logger.warn(`Failed login attempt for ${username}`, { ip: req.ip });
       // Introduce delay
-      await delay(1000);
-      return res.status(400).json("Login failed: Invalid Credentials");
+      await randomizedDelay();
+      return res.status(400).json("Login failed. Invalid Credentials");
+    }
+
+    // If MFA is enabled, require OTP
+    if (user.mfaEnabled) {
+      if (!otp) {
+        return res.status(400).json({ message: "OTP is required for MFA" });
+      }
+
+      const isValidOTP = speakeasy.totp.verify({
+        secret: user.mfaSecret,
+        encoding: "base32",
+        token: otp,
+        window: 1, // Allows +/- 30 sec time drift
+      });
+
+      if (!isValidOTP) {
+        return res.status(400).json({ message: "Invalid OTP" });
+      }
     }
 
     // Reset failed attempts on successful login
