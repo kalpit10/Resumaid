@@ -12,32 +12,39 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
+const morgan = require("morgan");
+// const { stream } = require("./logger");
+const { morganStream } = require("./morganLogger");
 
 const app = express();
+// HTTP request logging
+app.use(morgan("combined", { stream: morganStream }));
 
 const port = process.env.PORT;
 
-const allowedOrigins = ["http://localhost:3000"]; //  Only allow frontend domains
+const allowedOrigins = ["http://localhost:3000"]; // Only allow frontend domains
 
-// Securing HTTP Headers to Prevent Clickjacking, XSS, and Security Misconfigurations
+// Secure HTTP Headers to Prevent Clickjacking, XSS, and Security Misconfigurations
 app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"], // Removed 'unsafe-inline' to prevent XSS
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
       },
     },
-    frameguard: { action: "deny" }, // Prevents clickjacking
-    noSniff: true, // Prevents MIME-type sniffing
-    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // HSTS Preloading
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-    hidePoweredBy: true, // Hides 'X-Powered-By' header
+    frameguard: { action: "deny" }, // Prevents Clickjacking (fixes Nikto warning)
+    noSniff: true, // Prevents MIME-type sniffing (fixes Nikto warning)
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }, // HSTS Preloading (forces HTTPS)
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" }, // Controls referrer exposure
+    hidePoweredBy: true, // Hides 'X-Powered-By' header (fixes Nikto warning)
+    xssFilter: true, // Mitigates reflected XSS attacks
   })
 );
 
+// Strict CORS Policy
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -50,9 +57,11 @@ app.use(
     credentials: true, // Allow cookies only for trusted origins
     methods: ["GET", "POST", "PUT", "DELETE"], // Restrict allowed methods
     allowedHeaders: ["Content-Type", "Authorization"], // Restrict headers
-    optionsSuccessStatus: 200, // Handle preflight requests properly
+    optionsSuccessStatus: 204, // Fixes preflight request issues
   })
 );
+
+app.disable("x-powered-by"); // Disables the 'X-Powered-By' header
 
 app.use(mongoSanitize()); // all user inputs will be automatically sanitized before reaching MongoDB.
 
@@ -90,6 +99,10 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
+
+app.get("/debug-headers", (req, res) => {
+  res.json({ headers: res.getHeaders() });
 });
 
 //single means single file, for multiple files we say upload.arrays
