@@ -211,7 +211,7 @@ router.post("/login", loginLimiter, async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, username: user.username, role: "user" },
-      process.env.SECRET_KEY,
+      process.env.SECRET_KEY, //Mixing it with JWT Token to fail signature on websites like jwt.io
       { expiresIn: "30m" }
     );
 
