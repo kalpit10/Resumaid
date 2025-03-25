@@ -104,15 +104,39 @@ function SkillsEducation() {
                     <Form.Item
                       {...restField}
                       name={[name, "percentage"]}
-                      label={[label, "Percentage"]}
+                      label="Percentage / GPA"
                       rules={[
                         {
                           required: true,
-                          message: "Missing percentage",
+                          message: "This field is required",
+                        },
+                        {
+                          validator: (_, value) => {
+                            if (!value)
+                              return Promise.reject("This field is required");
+
+                            const num = parseFloat(value);
+
+                            if (isNaN(num)) {
+                              return Promise.reject("Must be a valid number");
+                            }
+
+                            if (num >= 0 && num <= 10) {
+                              return Promise.resolve(); // GPA
+                            }
+
+                            if (num > 10 && num <= 100) {
+                              return Promise.resolve(); // Percentage
+                            }
+
+                            return Promise.reject(
+                              "Enter a valid GPA (0-10) or Percentage (0-100)"
+                            );
+                          },
                         },
                       ]}
                     >
-                      <Input placeholder="Percentage" />
+                      <Input />
                     </Form.Item>
                   </div>
                   <div className="col-md-2">
@@ -210,11 +234,25 @@ function SkillsEducation() {
                       rules={[
                         {
                           required: true,
-                          message: "Missing rating",
+                          message: "Rating is required",
+                        },
+                        {
+                          validator: (_, value) => {
+                            const num = parseFloat(value);
+                            if (!value)
+                              return Promise.reject("Rating is required");
+                            if (isNaN(num))
+                              return Promise.reject("Rating must be a number");
+                            if (num < 1 || num > 10)
+                              return Promise.reject(
+                                "Rating must be between 1 and 10"
+                              );
+                            return Promise.resolve();
+                          },
                         },
                       ]}
                     >
-                      <Input placeholder="Rating" />
+                      <Input placeholder="Rating (1 - 10)" />
                     </Form.Item>
                   </div>
 
