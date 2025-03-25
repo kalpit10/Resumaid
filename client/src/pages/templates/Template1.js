@@ -8,14 +8,33 @@ import {
 import "../../resources/templates.css";
 
 const Template1 = () => {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("resume-user"))
-  );
+  const defaultUser = {
+    firstname: "",
+    lastname: "",
+    email: "",
+    mobileNumber: "",
+    portfolio: "",
+    address: "",
+    objective: "",
+    experience: [],
+    skills: [],
+    certificates: [],
+    courses: [],
+    projects: [],
+    education: [],
+    interests: [],
+    cocurricular: [],
+  };
+
+  const [user, setUser] = useState(() => {
+    const savedUser = JSON.parse(localStorage.getItem("resume-user"));
+    return savedUser ? { ...defaultUser, ...savedUser } : defaultUser;
+  });
 
   useEffect(() => {
     const updatedUser = JSON.parse(localStorage.getItem("resume-user"));
     if (updatedUser) {
-      setUser(updatedUser); // Update state with latest profile data
+      setUser({ ...defaultUser, ...updatedUser }); // Merge with defaults
     }
   }, []);
 
@@ -65,30 +84,23 @@ const Template1 = () => {
           {/* Left Column */}
           <Col md={6}>
             {/* Education Section */}
-            <section className="education">
-              <h4>
-                <b>Education</b>
-              </h4>
-              {user.education.length > 0 ? (
-                user.education.map((education, index) => (
-                  <div key={index} className="mb-2">
-                    <div className="d-flex gap-2">
-                      <b>{education.qualification}</b> :<p>{education.range}</p>
-                    </div>
-                    <b>{education.institution}</b>
-                    <br></br>
-                    <div className="d-flex gap-2">
-                      <p>{education.course}</p>:<b>{education.percentage}</b>
-                    </div>
+            {user.projects.length > 0 && (
+              <section className="projects mb-4">
+                <h4>
+                  <b>Personal Projects</b>
+                </h4>
+                {user.projects.map((project, index) => (
+                  <div key={index} className="mb-3">
+                    <h6>
+                      <b>{project.title}</b>
+                    </h6>
+                    <p>{project.description}</p>
                   </div>
-                ))
-              ) : (
-                <p>No education details provided</p>
-              )}
-            </section>
+                ))}
+              </section>
+            )}
 
             {/* Experience Section */}
-
             {user.experience.length > 0 && (
               <section className="experience mt-4">
                 <h4>
@@ -111,22 +123,23 @@ const Template1 = () => {
                 ))}
               </section>
             )}
-            <section className="courses mb-4">
-              <h4>
-                <b>Courses</b>
-              </h4>
-              {user.courses.map((course) => {
-                return (
-                  <div className="d-flex flex-column">
-                    <h6>
-                      <b>{course.name}</b>
-                    </h6>
-                    <p>{course.organization}</p>
-                  </div>
-                );
-              })}
-            </section>
-
+            {user.courses.length > 0 && (
+              <section className="courses mb-4">
+                <h4>
+                  <b>Courses</b>
+                </h4>
+                {user.courses.map((course) => {
+                  return (
+                    <div className="d-flex flex-column">
+                      <h6>
+                        <b>{course.name}</b>
+                      </h6>
+                      <p>{course.organization}</p>
+                    </div>
+                  );
+                })}
+              </section>
+            )}
             {user.interests.length > 0 && (
               <section className="interests">
                 <h4>
@@ -138,7 +151,6 @@ const Template1 = () => {
               </section>
             )}
             <br></br>
-
             {user.cocurricular.length > 0 && (
               <section className="interests">
                 <h4>
@@ -159,50 +171,48 @@ const Template1 = () => {
           {/* Right Column */}
           <Col md={6}>
             {/* Projects Section */}
-            <section className="projects mb-4">
-              <h4>
-                <b>Personal Projects</b>
-              </h4>
-              {user.projects.length > 0 ? (
-                user.projects.map((project, index) => (
+            {user.projects.length > 0 && (
+              <section className="projects mb-4">
+                <h4>
+                  <b>Personal Projects</b>
+                </h4>
+                {user.projects.map((project, index) => (
                   <div key={index} className="mb-3">
                     <h6>
                       <b>{project.title}</b>
                     </h6>
                     <p>{project.description}</p>
                   </div>
-                ))
-              ) : (
-                <p>No projects listed</p>
-              )}
-            </section>
+                ))}
+              </section>
+            )}
 
             {/* Skills Section */}
-            <section className="skills mb-4">
-              <h4>
-                <b>Skills</b>
-              </h4>
-              {user.skills.length > 0 ? (
-                user.skills.map((skill, index) => (
+            {user.skills.length > 0 && (
+              <section className="skills mb-4">
+                <h4>
+                  <b>Skills</b>
+                </h4>
+
+                {user.skills.map((skill, index) => (
                   <div className="d-flex gap-2">
                     <p key={index} className="mb-2">
                       {skill.technology}
                     </p>{" "}
                     : <p>{skill.rating}</p>
                   </div>
-                ))
-              ) : (
-                <p>No skills listed</p>
-              )}
-            </section>
+                ))}
+              </section>
+            )}
 
             {/* Certificates Section */}
-            <section className="certificates mb-4">
-              <h4>
-                <b>Certificates</b>
-              </h4>
-              {user.certificates.length > 0 ? (
-                user.certificates.map((certificate, index) => (
+            {user.certificates.length > 0 && (
+              <section className="certificates mb-4">
+                <h4>
+                  <b>Certificates</b>
+                </h4>
+
+                {user.certificates.map((certificate, index) => (
                   <div key={index} className="mb-3">
                     <h6>
                       <b>{certificate.name}</b>
@@ -219,11 +229,9 @@ const Template1 = () => {
                       <p>{certificate.credential}</p>
                     )}
                   </div>
-                ))
-              ) : (
-                <p>No certificates available</p>
-              )}
-            </section>
+                ))}
+              </section>
+            )}
           </Col>
         </Row>
       </Container>
