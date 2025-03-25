@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Form, message, Spin, Tabs } from "antd";
 import Personalinfo from "../components/Personalinfo";
 import SkillsEducation from "../components/SkillsEducation";
@@ -7,50 +7,29 @@ import Certificates from "../components/Certificates";
 import Interests from "../components/Interests";
 import axios from "axios";
 import Header from "../components/Header";
-import { useNavigate } from "react-router-dom";
 
 function Profile() {
   const [userData, setUserData] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/user/profile", { withCredentials: true })
-      .then((response) => {
-        setUserData(response.data); // Store user data securely in state
-      })
-      .catch((error) => {
-        console.error("Failed to fetch user data", error);
-      });
-  }, []);
-
-  const navigate = useNavigate();
-
   const onFinish = async (values) => {
     setLoading(true);
     try {
       const result = await axios.post(
         "http://localhost:5000/api/user/update",
-        values, // backend should get it from JWT
+        values,
         { withCredentials: true }
       );
 
       if (result.data) {
-        setUserData(result.data); // Update user data in state
-        message.success("Profile updated successfully");
+        localStorage.setItem("resume-user", JSON.stringify(result.data));
       }
       setLoading(false);
+      message.success("Profile updated successfully");
     } catch (error) {
       setLoading(false);
-
-      if (error.response?.status === 401) {
-        message.error("Session expired. Please login again!");
-        localStorage.removeItem("resume-user"); // Clearing old session
-        navigate("/login");
-      } else {
-        message.error("Profile update failed");
-      }
+      message.error("Profile updation failed");
     }
   };
 
