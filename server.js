@@ -15,6 +15,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 // const { stream } = require("./logger");
 const { morganStream } = require("./morganLogger");
+const { encrypt, decrypt } = require("./utils/encryption"); // Import the encrypt function
 
 const app = express();
 // HTTP request logging
@@ -121,22 +122,29 @@ app.post("/upload", upload.single("File"), (req, res) => {
       //parsing here is necessary because otherwise the content is shown in buffer type, console.log() to check it.
       const resume = JSON.parse(resumeJson);
       const resumeFile = new resumeData({
-        name: resume.name || "",
-        email: resume.email || "",
-        skills: resume.skills || "",
-        experience: resume.experience || "",
-        education: resume.education || "",
-        projects: resume.projects || "",
-        interests: resume.interests || "",
-        certifications: resume.certifications || "",
-        objective: resume.objective || "",
-        summary: resume.summary || "",
-        technology: resume.technology || "",
-        languages: resume.languages || "",
-        links: resume.links || "",
-        contacts: resume.contacts || "",
-        positions: resume.positions || "",
-        profiles: resume.profiles || "",
+        name: resume.name ? encrypt(resume.name) : "",
+        email: resume.email ? encrypt(resume.email) : "",
+        phone: resume.phone ? encrypt(resume.phone) : "",
+        skills: resume.skills ? encrypt(resume.skills) : "",
+        experience: resume.experience ? encrypt(resume.experience) : "",
+        education: resume.education ? encrypt(resume.education) : "",
+        projects: resume.projects ? encrypt(resume.projects) : "",
+        interests: resume.interests ? encrypt(resume.interests) : "",
+        certification: resume.certification
+          ? encrypt(resume.certification)
+          : "",
+        objective: resume.objective ? encrypt(resume.objective) : "",
+        summary: resume.summary ? encrypt(resume.summary) : "",
+        technology: resume.technology ? encrypt(resume.technology) : "",
+        languages: resume.languages ? encrypt(resume.languages) : "",
+        links: resume.links ? encrypt(resume.links) : "",
+        contacts: resume.contacts ? encrypt(resume.contacts) : "",
+        positions: resume.positions ? encrypt(resume.positions) : "",
+        profiles: resume.profiles ? encrypt(resume.profiles) : "",
+        awards: resume.awards ? encrypt(resume.awards) : "",
+        honors: resume.honors ? encrypt(resume.honors) : "",
+        additional: resume.additional ? encrypt(resume.additional) : "",
+        courses: resume.courses ? encrypt(resume.courses) : "",
       });
 
       return resumeFile.save();
@@ -158,38 +166,87 @@ app.post("/upload", upload.single("File"), (req, res) => {
 // -----------------------RESULT API----------------------------------------------
 
 //this endpoint will send the latest json file to the score.js file in react and use that file's data
-app.get("/result", (req, res) => {
-  // Get the list of JSON files in the directory
-  const dirPath = path.join(
-    __dirname,
-    "resume-parser-master",
-    "resumeFiles",
-    "compiled"
-  );
+app.get("/result", async (req, res) => {
+  try {
+    const latestResume = await resumeData.findOne().sort({ createdAt: -1 });
 
-  const files = fs
-    .readdirSync(dirPath)
-    .filter((file) => file.endsWith(".json"));
+    if (!latestResume) {
+      return res.status(404).json({ message: "No resume data found" });
+    }
 
-  // Sort the list of files by creation time in descending order
-  files.sort((a, b) => {
-    return (
-      fs.statSync(path.join(dirPath, b)).ctimeMs -
-      fs.statSync(path.join(dirPath, a)).ctimeMs
-    );
-  });
+    const resume = latestResume.toObject();
 
-  // Get the latest file name
-  const latestFile = files[0];
+    // Safe decryption
+    resume.name = resume.name?.includes(":")
+      ? decrypt(resume.name)
+      : resume.name;
+    resume.email = resume.email?.includes(":")
+      ? decrypt(resume.email)
+      : resume.email;
+    resume.phone = resume.phone?.includes(":")
+      ? decrypt(resume.phone)
+      : resume.phone;
+    resume.skills = resume.skills?.includes(":")
+      ? decrypt(resume.skills)
+      : resume.skills;
+    resume.experience = resume.experience?.includes(":")
+      ? decrypt(resume.experience)
+      : resume.experience;
+    resume.education = resume.education?.includes(":")
+      ? decrypt(resume.education)
+      : resume.education;
+    resume.projects = resume.projects?.includes(":")
+      ? decrypt(resume.projects)
+      : resume.projects;
+    resume.interests = resume.interests?.includes(":")
+      ? decrypt(resume.interests)
+      : resume.interests;
+    resume.certification = resume.certification?.includes(":")
+      ? decrypt(resume.certification)
+      : resume.certification;
+    resume.objective = resume.objective?.includes(":")
+      ? decrypt(resume.objective)
+      : resume.objective;
+    resume.summary = resume.summary?.includes(":")
+      ? decrypt(resume.summary)
+      : resume.summary;
+    resume.technology = resume.technology?.includes(":")
+      ? decrypt(resume.technology)
+      : resume.technology;
+    resume.languages = resume.languages?.includes(":")
+      ? decrypt(resume.languages)
+      : resume.languages;
+    resume.links = resume.links?.includes(":")
+      ? decrypt(resume.links)
+      : resume.links;
+    resume.contacts = resume.contacts?.includes(":")
+      ? decrypt(resume.contacts)
+      : resume.contacts;
+    resume.positions = resume.positions?.includes(":")
+      ? decrypt(resume.positions)
+      : resume.positions;
+    resume.profiles = resume.profiles?.includes(":")
+      ? decrypt(resume.profiles)
+      : resume.profiles;
+    resume.awards = resume.awards?.includes(":")
+      ? decrypt(resume.awards)
+      : resume.awards;
+    resume.honors = resume.honors?.includes(":")
+      ? decrypt(resume.honors)
+      : resume.honors;
+    resume.additional = resume.additional?.includes(":")
+      ? decrypt(resume.additional)
+      : resume.additional;
+    resume.courses = resume.courses?.includes(":")
+      ? decrypt(resume.courses)
+      : resume.courses;
 
-  // Read the JSON data from the latest file
-  const jsonData = JSON.parse(
-    fs.readFileSync(path.join(dirPath, latestFile), "utf-8")
-  );
-
-  // Send the JSON data as the response
-  res.send(jsonData);
-  console.log(jsonData);
+    res.json(resume);
+    console.log(resume);
+  } catch (error) {
+    console.error("Error fetching/decrypting resume:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 //------------COLLEGE DATA----------------------
