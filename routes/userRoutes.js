@@ -9,6 +9,7 @@ const logger = require("../logger");
 const authenticationMiddleware = require("../middlewares/authMiddleware");
 const bcrypt = require("bcryptjs");
 const rateLimit = require("express-rate-limit");
+const { encrypt, decrypt } = require("../utils/encryption");
 
 // const College = require("../models/colleges");
 // const fs = require("fs");
@@ -73,7 +74,7 @@ router.post("/enable-mfa", async (req, res) => {
     });
 
     // Store secret in DB
-    user.mfaSecret = secret.base32;
+    user.mfaSecret = encrypt(secret.base32); // Encrypt the secret before storing
     user.mfaEnabled = true;
     await user.save();
 
@@ -103,8 +104,9 @@ router.post("/verify-mfa", async (req, res) => {
       return res.status(404).json({ message: "User or MFA not found" });
     }
 
+    const decryptedSecret = decrypt(user.mfaSecret); //decrypt the secret before verifying
     const isVerified = speakeasy.totp.verify({
-      secret: user.mfaSecret,
+      secret: decryptedSecret,
       encoding: "base32",
       token,
       window: 1, // 30 sec window on either side
@@ -183,9 +185,10 @@ router.post("/login", loginLimiter, async (req, res) => {
       if (!otp) {
         return res.status(400).json({ message: "OTP is required for MFA" });
       }
+      const decryptedSecret = decrypt(user.mfaSecret); //decrypt the secret before verifying
 
       const isValidOTP = speakeasy.totp.verify({
-        secret: user.mfaSecret,
+        secret: decryptedSecret,
         encoding: "base32",
         token: otp,
         window: 1, // Allows +/- 30 sec time drift
@@ -219,7 +222,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       httpOnly: true, // Protects against XSS
       secure: process.env.NODE_ENV === "production", // Secure in production
       sameSite: "Strict", // Prevents CSRF
-      maxAge: 30 * 60 * 1000, // 30 minutes expiration
+      maxAge: 120 * 60 * 1000, // 2 hours expiration
     });
 
     logger.info(`User logged in successfully`, { username });
@@ -296,9 +299,17 @@ router.post("/register", async (req, res) => {
 // Users cannot update another user’s profile
 router.post("/update", authenticationMiddleware, async (req, res) => {
   try {
+    const body = { ...req.body };
+
+    // Encrypt sensitive fields only if they exist
+    if (body.email) body.email = encrypt(body.email);
+    if (body.mobileNumber) body.mobileNumber = encrypt(body.mobileNumber);
+    if (body.address) body.address = encrypt(body.address);
+    // if(body.mfaSecret) body.mfaSecret = encrypt(body.mfaSecret);
+
     const user = await User.findOneAndUpdate(
       { _id: req.user.userId }, // Now updates only the authenticated user's profile
-      req.body,
+      body,
       { new: true }
     );
 
@@ -309,6 +320,39 @@ router.post("/update", authenticationMiddleware, async (req, res) => {
     res.json(user);
   } catch (error) {
     res.status(400).json(error);
+  }
+});
+
+router.get("/profile", authenticationMiddleware, async (req, res) => {
+  try {
+    // we use lean function to get a plain javascript object(POJOs) instead of mongoose document
+    // this is useful for performance reasons and to avoid Mongoose's overhead
+    const user = await User.findById(req.user.userId).lean();
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const decryptedUser = {
+      ...user,
+      email:
+        typeof user.email === "string" && user.email.includes(":")
+          ? decrypt(user.email)
+          : user.email || "",
+
+      mobileNumber:
+        typeof user.mobileNumber === "string" && user.mobileNumber.includes(":")
+          ? decrypt(user.mobileNumber)
+          : user.mobileNumber || "",
+
+      address:
+        typeof user.address === "string" && user.address.includes(":")
+          ? decrypt(user.address)
+          : user.address || "",
+    };
+
+    res.json(decryptedUser);
+  } catch (err) {
+    console.error("Error fetching user profile:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
