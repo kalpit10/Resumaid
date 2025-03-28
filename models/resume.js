@@ -1,71 +1,32 @@
 const mongoose = require("mongoose");
 
-const resumeSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: false,
+const resumeSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    phone: String,
+    skills: String,
+    experience: String,
+    education: String,
+    projects: String,
+    interests: String,
+    certification: String,
+    objective: String,
+    summary: String,
+    technology: String,
+    languages: String,
+    links: String,
+    contacts: String,
+    positions: String,
+    profiles: String,
+    awards: String,
+    honors: String,
+    additional: String,
+    courses: String,
   },
-  email: {
-    type: String,
-    required: false,
-  },
-  skills: {
-    type: String,
-    required: false,
-  },
-  experience: {
-    type: String,
-    required: false,
-  },
-  education: {
-    type: String,
-    required: false,
-  },
-  projects: {
-    type: String,
-    required: false,
-  },
-  interests: {
-    type: String,
-    required: false,
-  },
-  certifications: {
-    type: String,
-    required: false,
-  },
-  objective: {
-    type: String,
-    required: false,
-  },
-  summary: {
-    type: String,
-    required: false,
-  },
-  technology: {
-    type: String,
-    required: false,
-  },
-  languages: {
-    type: String,
-    required: false,
-  },
-  links: {
-    type: String,
-    required: false,
-  },
-  contacts: {
-    type: String,
-    required: false,
-  },
-  positions: {
-    type: String,
-    required: false,
-  },
-  profiles: {
-    type: String,
-    required: false,
-  },
-});
+  { timestamps: true }
+);
+
 const resumeData = mongoose.model("Resume", resumeSchema);
 
 module.exports = resumeData;
