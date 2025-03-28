@@ -21,7 +21,7 @@ async function Score() {
       suggestions.push("Write some skills\n\n");
     }
 
-    if (data.courses || data.certifications || data.certification) {
+    if (data.courses || data.certifications || data.certification || data.certificates) {
       score += 5;
       positives.push("✔ Certifications/Courses are included");
     } else {
