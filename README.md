@@ -1,44 +1,167 @@
-# RESUMAID
+# RESUMAID - Resume Builder & ATS Scanner
 
-This is a MERN Stack web application that allows users to create their own resumes and also check their resume scores by uploading a .docx file.
+## Overview
 
-# Features
+Resumaid is a secure and modern MERN stack web application that allows users to:
 
-User registration and login system.
-Resume builder that allows users to create their own resumes.
-Resume score checker that parses the uploaded .docx file in JSON format and scores it accordingly.
-User profile management that allows users to view and edit their own information.
-Integration with a MongoDB database to store user information, resumes, and resume scores.
-Responsive design for use on desktop, tablet, and mobile devices.
+- Create professional resumes using customizable templates
+- Upload their resumes in `.docx` format for ATS (Applicant Tracking System) analysis
+- View personalized feedback and score
+- Securely manage their profile with sensitive information encrypted in the database
 
-# Technologies
+This project is built with a strong focus on **OWASP Top 10** security best practices, **PIPEDA-compliant** data protection, and is **containerized with Docker** for secure deployment.
 
-MongoDB, Express.js, React.js, Node.js (MERN Stack)
-JSON parsing library
-Docker for containerization
-Winston for logging and monitoring
-Bootstrap 5
+---
 
-# Installation
+## ⚠️ About this Branch
 
-1. Clone the repository
-2. If you want to clone the production (main) branch, use the command on the terminal: git clone https://github.com/kalpit10/Resumaid.git
-3. For reviewing the testing branch, you can use the command on the terminal: git clone -b testing https://github.com/kalpit10/Resumaid.git
-4. Install node modules for the project inside the parent directory using the command: *npm i*
-5. Install node modules inside the client directory using the command: *npm i*
-6. Create a .env file inside the parent directory and paste your own MONGODB string.
-7. Inside parent directory, run the command: *npm run dev*
-8. Wait for the server and client to start.
-9. If the above command doesn't work, go inside client and run the command: *npm start*
-10. Open a new terminal and go back to the parent directory where the server code resides and run the command: *node server.js*
+This branch (`testing`) is used **only for testing new security features and experimental improvements** before merging into the main branch.
 
-# Usage
+✅ For the **latest stable and production-ready code**, switch to the `main` branch:  
+`https://github.com/kalpit10/Resumaid`
 
-1. Register or log in to create an account.
-2. Create a new resume by filling out the form in the profile section.
-3. Upload a .docx file to check your resume score.
-4. View your resume scores and profile information.
+---
 
-# Contributors
+## Features
 
-Name- Kalpit Swami
+### ✅ User Authentication
+
+- Enforced strong password policy (uppercase, symbols, digits, min length 16)
+- Passwords hashed with **bcrypt** using 12 salt rounds
+- Accounts secured with **Multi-Factor Authentication (MFA)** using Google Authenticator
+
+### 🧾 Resume Builder
+
+- Users input resume data through a structured profile form
+- Supports various customizable resume templates
+- **Data encrypted with AES-256-CBC** before storing in MongoDB
+
+### 📄 ATS Resume Scanner
+
+- Upload `.docx` resume
+- Resume parsed and analyzed for ATS sections like skills, experience, etc.
+- **Parsed resume data is encrypted** before being saved
+- ATS score and feedback displayed in real-time
+
+### 👤 Profile Management
+
+- Personal details like email, phone, and address are encrypted using **Node.js crypto module (AES-256-CBC)**
+- Secure route handling via middleware and JWT tokens
+
+### 🛡️ Logging & Monitoring
+
+- **Winston** logs app events and errors
+- **Morgan** logs HTTP request details
+- Logs stored in `/logs` folder (`error.log`, `combined.log`, `http-morgan.log`) for future SIEM analysis
+
+### 🐳 Dockerized Architecture
+
+- Complete Docker support for local deployment
+- Services for backend, frontend, and MongoDB containerized using Docker Compose
+- Secure environment configuration via `.env` file
+
+---
+
+## 🛡 Security Highlights (OWASP Top 10)
+
+### A01: Broken Access Control
+
+- Routes are secured using JWT authentication middleware
+- Users can only access and update their own data
+
+### A02: Cryptographic Failures
+
+- AES-256-CBC used for encrypting PII fields (email, phone, address, MFA secret)
+- All encryption/decryption operations use environment-defined secret keys
+
+### A03: Injection
+
+- MongoDB queries use input sanitization and strict regex validation
+- Prevents NoSQL injection and other malicious input exploits
+
+### A04: Insecure Design
+
+- Generic error messages avoid exposing backend logic
+- No sensitive information is printed in the frontend console
+- JWT secrets, encryption keys, DB credentials are securely stored in `.env`
+
+### A05: Security Misconfiguration
+
+- `.env` excluded from version control
+- Rate limiting applied to login endpoint
+- Production and development environments clearly separated
+
+### A06: Vulnerable & Outdated Components
+
+- Latest stable Node.js (v18) and up-to-date dependencies used
+- Deprecated modules like `crypto-js` replaced with native `crypto`
+
+### A07: Identification and Authentication Failures
+
+- JWT tokens use secure flags: `httpOnly`, `secure`, `sameSite=Strict`
+- Short-lived sessions (30 minutes)
+- MFA (OTP via TOTP) enabled
+- Lockout after multiple failed login attempts
+
+### A08: Software & Data Integrity Failures
+
+- Backend and frontend built in isolated Docker containers
+- JWT tokens are cryptographically signed
+- Build integrity maintained through `Dockerfile` separation
+
+### A09: Security Logging & Monitoring Failures
+
+- Winston logs app-level events (login, errors, warnings)
+- Morgan logs detailed HTTP request activity
+- Failed logins and rate-limit violations recorded with IP and username for anomaly detection
+
+### A10: Server-Side Request Forgery (SSRF)
+
+- No external requests are accepted from client-side input
+- All third-party integrations are controlled from the backend
+
+---
+
+## 🧪 Installation (for Local Testing)
+
+## 1. Clone the testing branch
+
+git clone -b testing https://github.com/kalpit10/Resumaid.git
+
+## 2. Navigate to root directory
+
+cd Resumaid
+
+## 3. Install backend dependencies
+
+npm install
+
+## 4. Install frontend dependencies
+
+cd client && npm install && cd ..
+
+# 5. Create a .env file in the root directory
+
+# Mention all the secret keys that are required
+
+# For example: MONGODB_URI=your_mongodb_uri
+
+# 6. Run development servers
+
+npm run dev
+
+# 👨‍💻 Author
+
+Kalpit Swami
+Cybersecurity Enthusiast | MERN Developer | OWASP-Compliant Builder
+GitHub: kalpit10
+LinkedIn: https://www.linkedin.com/in/kalpitswami
+
+# Security Learners!
+
+This project is designed with real-world OWASP Top 10 implementation examples. If you're learning web security or building secure applications, feel free to clone, explore, and test this project.
+
+💬 Got questions? Connect on LinkedIn
+🙌 If you use this project in your portfolio, schoolwork, or presentations — please don’t forget to credit me on LinkedIn!
+
+Securely build. Securely ship. 🔐
