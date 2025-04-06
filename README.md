@@ -152,7 +152,8 @@ npm run dev
 # 👨‍💻 Author
 
 Kalpit Swami
-Cybersecurity Enthusiast | MERN Developer | OWASP-Compliant Builder
+
+(Cybersecurity Enthusiast | MERN Developer | OWASP-Compliant Builder)
 GitHub: kalpit10
 LinkedIn: https://www.linkedin.com/in/kalpitswami
 
