@@ -140,13 +140,12 @@ npm install
 
 cd client && npm install && cd ..
 
-# 5. Create a .env file in the root directory
+## 5. Create a .env file in the root directory
 
-# Mention all the secret keys that are required
+- Mention all the secret keys that are required
+- For example: MONGODB_URI=your_mongodb_uri
 
-# For example: MONGODB_URI=your_mongodb_uri
-
-# 6. Run development servers
+## 6. Run development servers
 
 npm run dev
 
