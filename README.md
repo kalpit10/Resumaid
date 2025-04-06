@@ -154,8 +154,8 @@ npm run dev
 Kalpit Swami
 
 (Cybersecurity Enthusiast | MERN Developer | OWASP-Compliant Builder)
-GitHub: kalpit10
-LinkedIn: https://www.linkedin.com/in/kalpitswami
+- GitHub: kalpit10
+- LinkedIn: https://www.linkedin.com/in/kalpitswami
 
 # Security Learners!
 
